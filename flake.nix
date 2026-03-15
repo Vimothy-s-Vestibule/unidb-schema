@@ -10,7 +10,7 @@
         mysqlSupport = false;
       };
     in {
-      devShells.${system}.default = nixpkgs.legacyPackages.${system}.mkShell {
+      devShells.${system}.default = pkgs.mkShell {
         nativeBuildInputs = [ dc ];
       };
     };
