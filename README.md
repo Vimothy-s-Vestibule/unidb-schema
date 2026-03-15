@@ -47,3 +47,6 @@ let all_users: Vec<(VestibuleUserRecord, DiscordMessage)> = vestibule_users::tab
 
 // ...
 ```
+
+## About Array<Nullable<Text>> and Vec<Option<String>>
+This is serialized like this because postgres cannot guarantee that any element in the array is not NULL or None in rust terms. I'll get right on writing a helper to convert this into a Vec<String> because we're enforcing that all Strings are Some in a Vec in the app logic and the rust compiler is doing that too.
