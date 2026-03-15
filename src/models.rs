@@ -128,8 +128,8 @@ pub struct Values {
 )]
 #[diesel(table_name = crate::diesel_schema::vestibule_users)]
 pub struct Interests {
-    pub domains: Vec<String>,
-    pub activities: Vec<String>,
+    pub domains: Vec<Option<String>>,
+    pub activities: Vec<Option<String>>,
 }
 
 #[derive(

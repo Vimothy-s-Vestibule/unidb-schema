@@ -1,3 +1,5 @@
+// @generated automatically by Diesel CLI.
+
 diesel::table! {
     use diesel::sql_types::*;
     use pgvector::sql_types::Vector;
@@ -41,8 +43,8 @@ diesel::table! {
         intro_embedding -> Nullable<Vector>,
         intro_diagram -> Nullable<Bytea>,
         status -> Text,
-        activities -> Array<Text>,
-        domains -> Array<Text>,
+        activities -> Array<Nullable<Text>>,
+        domains -> Array<Nullable<Text>>,
     }
 }
 
