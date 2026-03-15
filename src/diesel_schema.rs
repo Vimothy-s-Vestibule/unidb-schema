@@ -4,7 +4,6 @@ diesel::table! {
 
     messages (message_id) {
         message_id -> Text,
-        username -> Text,
         user_id -> Text,
         content -> Text,
         created_at -> Timestamptz,
