@@ -26,3 +26,5 @@ target/# Python-generated files
 
 # VSCode
 **/.vscode/
+
+/.direnv
