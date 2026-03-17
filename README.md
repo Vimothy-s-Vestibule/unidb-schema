@@ -1,6 +1,6 @@
 To add the schema and rust models as a dependency in a rust project:
 ```toml
-syl-scr-common = { git = "https://github.com/Vimothy-s-Vestibule/unidb-schema" }
+unidb = { git = "https://github.com/Vimothy-s-Vestibule/unidb-schema" }
 ```
 
 Other useful things to work with the db:
@@ -19,8 +19,8 @@ dotenvy = "0.15.7"
 ```
 Using it with tokio, diesel, diesel-async:
 ```rust
-use syl_scr_common::diesel_schema::vestibule_users;
-use syl_scr_common::models::{DiscordMessage, RecordStatus, VestibuleUserRecord};
+use unidb::diesel_schema::vestibule_users;
+use unidb::models::{DiscordMessage, RecordStatus, VestibuleUserRecord};
 
 // ...
 let database_url = env::var("DATABASE_URL").map_err(|e| AppError::AppError(Box::new(e)))?;
@@ -33,7 +33,7 @@ let pool = Pool::builder(config).build().unwrap();
  let mut conn = pool.get().await.unwrap();
 
 let all_users: Vec<(VestibuleUserRecord, DiscordMessage)> = vestibule_users::table
-            .inner_join(syl_scr_common::diesel_schema::messages::table)
+            .inner_join(unidb::diesel_schema::messages::table)
             .select((
                 VestibuleUserRecord::as_select(),
                 DiscordMessage::as_select(),
