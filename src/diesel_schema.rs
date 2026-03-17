@@ -8,7 +8,9 @@ diesel::table! {
         message_id -> Text,
         user_id -> Text,
         content -> Text,
-        created_at -> Timestamptz,
+        sent_at -> Timestamptz,
+        added_at -> Timestamptz,
+        score_id -> Nullable<Text>,
     }
 }
 
@@ -16,12 +18,8 @@ diesel::table! {
     use diesel::sql_types::*;
     use pgvector::sql_types::Vector;
 
-    vestibule_users (discord_user_id) {
-        discord_user_id -> Text,
-        discord_username -> Text,
-        yt_username -> Nullable<Text>,
-        yt_display_name -> Nullable<Text>,
-        intro_message_id -> Nullable<Text>,
+    scores (score_id) {
+        score_id -> Text,
         honesty_humility -> Float8,
         emotionality -> Float8,
         extraversion -> Float8,
@@ -40,14 +38,34 @@ diesel::table! {
         tradition -> Float8,
         benevolence -> Float8,
         universalism -> Float8,
-        intro_embedding -> Nullable<Vector>,
-        intro_diagram -> Nullable<Bytea>,
-        status -> Text,
         activities -> Array<Nullable<Text>>,
         domains -> Array<Nullable<Text>>,
+        embedding -> Nullable<Vector>,
+        intro_diagram -> Nullable<Bytea>,
+        current_diagram -> Nullable<Bytea>,
+    }
+}
+
+diesel::table! {
+    use diesel::sql_types::*;
+    use pgvector::sql_types::Vector;
+
+    vestibule_users (discord_user_id) {
+        discord_user_id -> Text,
+        discord_username -> Text,
+        yt_username -> Nullable<Text>,
+        yt_display_name -> Nullable<Text>,
+        intro_message_id -> Nullable<Text>,
+        // All major Acitivites over time, more general than per message
+        // Embedding used to store a user's skills and abilities, changing over time (TODO cronjob?)
+        score_id -> Nullable<Text>,
+        status -> Text,
     }
 }
 
 diesel::joinable!(vestibule_users -> messages (intro_message_id));
 
-diesel::allow_tables_to_appear_in_same_query!(messages, vestibule_users,);
+diesel::joinable!(messages -> scores (score_id));
+diesel::joinable!(vestibule_users -> scores (score_id));
+
+diesel::allow_tables_to_appear_in_same_query!(messages, vestibule_users, scores);

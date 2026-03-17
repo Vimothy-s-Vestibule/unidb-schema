@@ -19,6 +19,17 @@ pub struct VestibuleUserRecord {
     pub yt_username: Option<String>,
     pub yt_display_name: Option<String>,
     pub intro_message_id: Option<String>,
+    pub score_id: Option<String>,
+    pub status: RecordStatus,
+}
+
+#[derive(
+    Debug, Clone, Queryable, QueryableByName, Selectable, Insertable, AsChangeset, Default,
+)]
+#[diesel(table_name = crate::diesel_schema::scores)]
+#[diesel(check_for_backend(diesel::pg::Pg))]
+pub struct ScoreRecord {
+    pub score_id: String,
 
     #[diesel(embed)]
     pub personality: PersonalityTraits,
@@ -29,8 +40,7 @@ pub struct VestibuleUserRecord {
     #[diesel(embed)]
     pub interests: Interests,
 
-    pub intro_embedding: Option<pgvector::Vector>,
+    pub embedding: Option<pgvector::Vector>,
     pub intro_diagram: Option<Vec<u8>>,
-
-    pub status: RecordStatus,
+    pub current_diagram: Option<Vec<u8>>,
 }

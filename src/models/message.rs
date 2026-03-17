@@ -8,5 +8,7 @@ pub struct DiscordMessage {
     pub message_id: String,
     pub user_id: String,
     pub content: String,
-    pub created_at: chrono::DateTime<chrono::Utc>,
+    pub sent_at: chrono::DateTime<chrono::Utc>,
+    pub added_at: chrono::DateTime<chrono::Utc>,
+    pub score_id: Option<String>,
 }

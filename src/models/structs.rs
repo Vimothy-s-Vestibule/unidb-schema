@@ -16,7 +16,8 @@ use crate::models::newtypes::TextVec;
     QueryableByName,
     Default,
 )]
-#[diesel(table_name = crate::diesel_schema::vestibule_users)]
+#[diesel(table_name = crate::diesel_schema::scores)]
+#[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct PersonalityTraits {
     pub honesty_humility: f64,
     pub emotionality: f64,
@@ -38,7 +39,8 @@ pub struct PersonalityTraits {
     QueryableByName,
     Default,
 )]
-#[diesel(table_name = crate::diesel_schema::vestibule_users)]
+#[diesel(table_name = crate::diesel_schema::scores)]
+#[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct CommunicationTraits {
     pub agency: f64,
     pub communion: f64,
@@ -56,7 +58,8 @@ pub struct CommunicationTraits {
     QueryableByName,
     Default,
 )]
-#[diesel(table_name = crate::diesel_schema::vestibule_users)]
+#[diesel(check_for_backend(diesel::pg::Pg))]
+#[diesel(table_name = crate::diesel_schema::scores)]
 pub struct Values {
     pub self_direction: f64,
     pub stimulation: f64,
@@ -82,7 +85,8 @@ pub struct Values {
     QueryableByName,
     Default,
 )]
-#[diesel(table_name = crate::diesel_schema::vestibule_users)]
+#[diesel(check_for_backend(diesel::pg::Pg))]
+#[diesel(table_name = crate::diesel_schema::scores)]
 pub struct Interests {
     pub domains: TextVec,
     pub activities: TextVec,
