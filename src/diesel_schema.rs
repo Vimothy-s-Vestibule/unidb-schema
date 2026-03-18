@@ -56,16 +56,13 @@ diesel::table! {
         yt_username -> Nullable<Text>,
         yt_display_name -> Nullable<Text>,
         intro_message_id -> Nullable<Text>,
-        // All major Acitivites over time, more general than per message
-        // Embedding used to store a user's skills and abilities, changing over time (TODO cronjob?)
-        score_id -> Nullable<Text>,
         status -> Text,
+        score_id -> Nullable<Text>,
     }
 }
 
-diesel::joinable!(vestibule_users -> messages (intro_message_id));
-
 diesel::joinable!(messages -> scores (score_id));
+diesel::joinable!(vestibule_users -> messages (intro_message_id));
 diesel::joinable!(vestibule_users -> scores (score_id));
 
-diesel::allow_tables_to_appear_in_same_query!(messages, vestibule_users, scores);
+diesel::allow_tables_to_appear_in_same_query!(messages, scores, vestibule_users,);

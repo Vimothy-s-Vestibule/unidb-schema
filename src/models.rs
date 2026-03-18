@@ -19,6 +19,7 @@ pub struct VestibuleUserRecord {
     pub yt_username: Option<String>,
     pub yt_display_name: Option<String>,
     pub intro_message_id: Option<String>,
+    // All major Acitivites/intersts over time, more general than per message, changing over time (TODO cronjob?)
     pub score_id: Option<String>,
     pub status: RecordStatus,
 }
