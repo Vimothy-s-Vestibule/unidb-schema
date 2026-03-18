@@ -4,6 +4,17 @@ diesel::table! {
     use diesel::sql_types::*;
     use pgvector::sql_types::Vector;
 
+    channels (channel_id) {
+        channel_id -> Text,
+        name -> Text,
+        channel_type -> Text,
+    }
+}
+
+diesel::table! {
+    use diesel::sql_types::*;
+    use pgvector::sql_types::Vector;
+
     messages (message_id) {
         message_id -> Text,
         user_id -> Text,
@@ -13,6 +24,7 @@ diesel::table! {
         score_id -> Nullable<Text>,
         in_reply_to -> Nullable<Text>,
         last_edited -> Nullable<Timestamptz>,
+        channel_id -> Text,
     }
 }
 
@@ -99,6 +111,7 @@ diesel::table! {
     }
 }
 
+diesel::joinable!(messages -> channels (channel_id));
 diesel::joinable!(messages -> scores (score_id));
 diesel::joinable!(user_skill_evidence -> messages (message_id));
 diesel::joinable!(user_skills -> skills (skill_id));
@@ -107,6 +120,7 @@ diesel::joinable!(vestibule_users -> messages (intro_message_id));
 diesel::joinable!(vestibule_users -> scores (score_id));
 
 diesel::allow_tables_to_appear_in_same_query!(
+    channels,
     messages,
     scores,
     skills,

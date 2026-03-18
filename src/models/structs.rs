@@ -60,7 +60,7 @@ pub struct CommunicationTraits {
 )]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 #[diesel(table_name = crate::diesel_schema::scores)]
-pub struct Values {
+pub struct PersonalityValues {
     pub self_direction: f64,
     pub stimulation: f64,
     pub hedonism: f64,
@@ -87,18 +87,7 @@ pub struct Values {
 )]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 #[diesel(table_name = crate::diesel_schema::scores)]
-pub struct Interests {
+pub struct PersonalityInterests {
     pub domains: TextVec,
     pub activities: TextVec,
-}
-
-#[derive(Debug, Clone, Deserialize, Serialize)]
-pub struct AiScoreResponse {
-    pub username: String,
-    pub user_id: String,
-    pub personality: PersonalityTraits,
-    pub communication: CommunicationTraits,
-    pub values: Values,
-    pub interests: Interests,
-    pub introduction_embedding: Option<Vec<f32>>,
 }

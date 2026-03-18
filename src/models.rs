@@ -1,3 +1,4 @@
+pub mod channel;
 pub mod message;
 pub mod newtypes;
 pub mod skill;
@@ -5,6 +6,7 @@ pub mod structs;
 
 use diesel::prelude::*;
 
+pub use channel::*;
 pub use message::*;
 pub use newtypes::*;
 pub use skill::*;
@@ -60,9 +62,9 @@ pub struct ScoreRecord {
     #[diesel(embed)]
     pub communication: CommunicationTraits,
     #[diesel(embed)]
-    pub values: Values,
+    pub values: PersonalityValues,
     #[diesel(embed)]
-    pub interests: Interests,
+    pub interests: PersonalityInterests,
 
     // For intro messages: Embed the whole message, for normal messages: dont generate embeddings, for users: dont generate embeddings
     pub embedding: Option<pgvector::Vector>,

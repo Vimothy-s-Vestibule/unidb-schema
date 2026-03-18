@@ -86,3 +86,42 @@ impl FromSql<Text, Pg> for RecordStatus {
         }
     }
 }
+
+// -------------------------
+
+#[derive(
+    Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, AsExpression, FromSqlRow, Default,
+)]
+#[diesel(sql_type = Text)]
+#[serde(rename_all = "lowercase")]
+pub enum ChannelType {
+    #[default]
+    Text,
+    Voice,
+    Forum,
+    Thread,
+}
+
+impl ToSql<Text, Pg> for ChannelType {
+    fn to_sql<'b>(&'b self, out: &mut Output<'b, '_, Pg>) -> serialize::Result {
+        match *self {
+            ChannelType::Text => out.write_all(b"text")?,
+            ChannelType::Voice => out.write_all(b"voice")?,
+            ChannelType::Forum => out.write_all(b"forum")?,
+            ChannelType::Thread => out.write_all(b"thread")?,
+        }
+        Ok(IsNull::No)
+    }
+}
+
+impl FromSql<Text, Pg> for ChannelType {
+    fn from_sql(bytes: diesel::pg::PgValue<'_>) -> deserialize::Result<Self> {
+        match bytes.as_bytes() {
+            b"text" => Ok(ChannelType::Text),
+            b"voice" => Ok(ChannelType::Voice),
+            b"forum" => Ok(ChannelType::Forum),
+            b"thread" => Ok(ChannelType::Thread),
+            _ => Err("Unrecognized enum variant".into()),
+        }
+    }
+}

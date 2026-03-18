@@ -1,7 +1,7 @@
 use diesel::prelude::*;
 use serde::{Deserialize, Serialize};
 
-use crate::models::{ScoreRecord, VestibuleUserRecord};
+use crate::models::{Channel, ScoreRecord, VestibuleUserRecord};
 
 #[derive(
     Serialize,
@@ -21,6 +21,7 @@ use crate::models::{ScoreRecord, VestibuleUserRecord};
 #[diesel(belongs_to(VestibuleUserRecord, foreign_key = user_id))]
 #[diesel(belongs_to(ScoreRecord, foreign_key = score_id))]
 #[diesel(belongs_to(DiscordMessage, foreign_key = in_reply_to))]
+#[diesel(belongs_to(Channel, foreign_key = channel_id))]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct DiscordMessage {
     pub message_id: String,
@@ -33,4 +34,5 @@ pub struct DiscordMessage {
     pub sent_at: chrono::DateTime<chrono::Utc>,
     pub added_at: chrono::DateTime<chrono::Utc>,
     pub score_id: Option<String>,
+    pub channel_id: String,
 }
