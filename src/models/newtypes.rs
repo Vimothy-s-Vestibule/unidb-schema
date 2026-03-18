@@ -100,6 +100,7 @@ pub enum ChannelType {
     Voice,
     Forum,
     Thread,
+    Stage,
 }
 
 impl ToSql<Text, Pg> for ChannelType {
@@ -109,6 +110,7 @@ impl ToSql<Text, Pg> for ChannelType {
             ChannelType::Voice => out.write_all(b"voice")?,
             ChannelType::Forum => out.write_all(b"forum")?,
             ChannelType::Thread => out.write_all(b"thread")?,
+            ChannelType::Stage => out.write_all(b"stage")?,
         }
         Ok(IsNull::No)
     }
@@ -121,6 +123,8 @@ impl FromSql<Text, Pg> for ChannelType {
             b"voice" => Ok(ChannelType::Voice),
             b"forum" => Ok(ChannelType::Forum),
             b"thread" => Ok(ChannelType::Thread),
+            b"stage" => Ok(ChannelType::Stage),
+
             _ => Err("Unrecognized enum variant".into()),
         }
     }
