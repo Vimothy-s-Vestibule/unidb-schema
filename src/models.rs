@@ -1,17 +1,31 @@
 pub mod message;
 pub mod newtypes;
+pub mod skill;
 pub mod structs;
 
 use diesel::prelude::*;
 
 pub use message::*;
 pub use newtypes::*;
+pub use skill::*;
 pub use structs::*;
 
 #[derive(
-    Debug, Clone, Queryable, QueryableByName, Selectable, Insertable, AsChangeset, Default,
+    Debug,
+    Clone,
+    Queryable,
+    QueryableByName,
+    Selectable,
+    Insertable,
+    AsChangeset,
+    Default,
+    Associations,
+    Identifiable,
 )]
 #[diesel(table_name = crate::diesel_schema::vestibule_users)]
+#[diesel(primary_key(discord_user_id))]
+#[diesel(belongs_to(DiscordMessage, foreign_key = intro_message_id))]
+#[diesel(belongs_to(ScoreRecord, foreign_key = score_id))]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct VestibuleUserRecord {
     pub discord_user_id: String,
@@ -25,9 +39,18 @@ pub struct VestibuleUserRecord {
 }
 
 #[derive(
-    Debug, Clone, Queryable, QueryableByName, Selectable, Insertable, AsChangeset, Default,
+    Debug,
+    Clone,
+    Queryable,
+    QueryableByName,
+    Selectable,
+    Insertable,
+    AsChangeset,
+    Default,
+    Identifiable,
 )]
 #[diesel(table_name = crate::diesel_schema::scores)]
+#[diesel(primary_key(score_id))]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct ScoreRecord {
     pub score_id: String,

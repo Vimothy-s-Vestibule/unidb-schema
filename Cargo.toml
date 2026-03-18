@@ -7,6 +7,7 @@ authors = ["Creative-Difficulty"]
 
 [dependencies]
 chrono = { version = "0.4", features = ["serde"] }
-diesel = { version = "2.3.6", features = ["postgres", "chrono"] }
+diesel = { version = "2.3.6", features = ["postgres", "chrono", "uuid"] }
 pgvector = { version = "0.4.1", features = ["diesel"] }
 serde = { version = "1.0.228", features = ["derive"] }
+uuid = { version = "1.22.0", features = ["v4", "serde"] }
