@@ -50,6 +50,42 @@ diesel::table! {
     use diesel::sql_types::*;
     use pgvector::sql_types::Vector;
 
+    skills (id) {
+        id -> Uuid,
+        name -> Text,
+        embedding -> Nullable<Vector>,
+    }
+}
+
+diesel::table! {
+    use diesel::sql_types::*;
+    use pgvector::sql_types::Vector;
+
+    user_skill_evidence (user_id, skill_id, message_id) {
+        user_id -> Text,
+        skill_id -> Uuid,
+        message_id -> Text,
+        weight -> Float4,
+        reasoning -> Text,
+    }
+}
+
+diesel::table! {
+    use diesel::sql_types::*;
+    use pgvector::sql_types::Vector;
+
+    user_skills (user_id, skill_id) {
+        user_id -> Text,
+        skill_id -> Uuid,
+        level -> Int2,
+        llm_context -> Nullable<Text>,
+    }
+}
+
+diesel::table! {
+    use diesel::sql_types::*;
+    use pgvector::sql_types::Vector;
+
     vestibule_users (discord_user_id) {
         discord_user_id -> Text,
         discord_username -> Text,
@@ -62,7 +98,17 @@ diesel::table! {
 }
 
 diesel::joinable!(messages -> scores (score_id));
+diesel::joinable!(user_skill_evidence -> messages (message_id));
+diesel::joinable!(user_skills -> skills (skill_id));
+diesel::joinable!(user_skills -> vestibule_users (user_id));
 diesel::joinable!(vestibule_users -> messages (intro_message_id));
 diesel::joinable!(vestibule_users -> scores (score_id));
 
-diesel::allow_tables_to_appear_in_same_query!(messages, scores, vestibule_users,);
+diesel::allow_tables_to_appear_in_same_query!(
+    messages,
+    scores,
+    skills,
+    user_skill_evidence,
+    user_skills,
+    vestibule_users,
+);

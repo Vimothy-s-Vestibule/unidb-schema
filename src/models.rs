@@ -41,7 +41,9 @@ pub struct ScoreRecord {
     #[diesel(embed)]
     pub interests: Interests,
 
+    // For intro messages: Embed the whole message, for normal messages: dont generate embeddings, for users: dont generate embeddings
     pub embedding: Option<pgvector::Vector>,
+
     pub intro_diagram: Option<Vec<u8>>,
     pub current_diagram: Option<Vec<u8>>,
 }
