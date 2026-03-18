@@ -11,6 +11,8 @@ diesel::table! {
         sent_at -> Timestamptz,
         added_at -> Timestamptz,
         score_id -> Nullable<Text>,
+        in_reply_to -> Nullable<Text>,
+        last_edited -> Nullable<Timestamptz>,
     }
 }
 
