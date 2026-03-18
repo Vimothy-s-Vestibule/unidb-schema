@@ -17,3 +17,9 @@ pub struct AiScoreResponse {
     pub interests: PersonalityInterests,
     pub introduction_embedding: Option<Vec<f32>>,
 }
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct NatsMessagePayload {
+    pub message_id: String,
+    pub is_intro: bool,
+}
