@@ -111,6 +111,7 @@ diesel::table! {
         status -> Text,
         score_id -> Nullable<Text>,
         score_last_updated -> Nullable<Timestamptz>,
+        discord_display_name -> Text,
     }
 }
 

@@ -32,6 +32,7 @@ pub use skill::*;
 pub struct VestibuleUserRecord {
     pub discord_user_id: String,
     pub discord_username: String,
+    pub discord_display_name: String,
     pub yt_username: Option<String>,
     pub yt_display_name: Option<String>,
     pub intro_message_id: Option<String>,
