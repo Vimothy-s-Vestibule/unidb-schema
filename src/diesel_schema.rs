@@ -125,7 +125,9 @@ diesel::table! {
     }
 }
 
+diesel::joinable!(messages -> channels (channel_id));
 diesel::joinable!(messages -> scores (score_id));
+diesel::joinable!(messages -> threads (thread_id));
 diesel::joinable!(threads -> channels (parent_channel_id));
 diesel::joinable!(user_skill_evidence -> messages (message_id));
 diesel::joinable!(user_skills -> skills (skill_id));
