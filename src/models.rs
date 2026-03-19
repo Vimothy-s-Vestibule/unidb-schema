@@ -1,16 +1,16 @@
 pub mod channel;
 pub mod message;
 pub mod newtypes;
+pub mod personality;
 pub mod skill;
-pub mod structs;
 
 use diesel::prelude::*;
 
 pub use channel::*;
 pub use message::*;
 pub use newtypes::*;
+pub use personality::*;
 pub use skill::*;
-pub use structs::*;
 
 #[derive(
     Debug,

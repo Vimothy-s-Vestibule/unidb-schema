@@ -3,7 +3,7 @@ pub mod models;
 
 use serde::{Deserialize, Serialize};
 
-use crate::models::{
+use crate::models::personality::{
     CommunicationTraits, PersonalityInterests, PersonalityTraits, PersonalityValues,
 };
 

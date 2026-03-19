@@ -25,6 +25,7 @@ diesel::table! {
         in_reply_to -> Nullable<Text>,
         last_edited -> Nullable<Timestamptz>,
         channel_id -> Text,
+        deleted_at -> Nullable<Timestamptz>,
     }
 }
 

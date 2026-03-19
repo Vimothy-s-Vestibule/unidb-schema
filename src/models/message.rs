@@ -33,6 +33,7 @@ pub struct DiscordMessage {
     // pub in_thread: Option<String>,
     pub sent_at: chrono::DateTime<chrono::Utc>,
     pub added_at: chrono::DateTime<chrono::Utc>,
+    pub deleted_at: Option<chrono::DateTime<chrono::Utc>>,
     pub score_id: Option<String>,
     pub channel_id: String,
 }

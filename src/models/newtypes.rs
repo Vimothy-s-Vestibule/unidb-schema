@@ -125,7 +125,7 @@ impl FromSql<Text, Pg> for ChannelType {
             b"thread" => Ok(ChannelType::Thread),
             b"stage" => Ok(ChannelType::Stage),
 
-            _ => Err("Unrecognized enum variant".into()),
+            _other => Err(format!("not a text channel type: {:#?}", _other).into()),
         }
     }
 }
