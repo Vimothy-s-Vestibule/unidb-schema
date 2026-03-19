@@ -79,7 +79,7 @@ diesel::table! {
 
     threads (thread_id) {
         thread_id -> Text,
-        channel_id -> Text,
+        parent_channel_id -> Text,
         name -> Text,
         thread_type -> Text,
     }
@@ -126,7 +126,7 @@ diesel::table! {
 }
 
 diesel::joinable!(messages -> scores (score_id));
-diesel::joinable!(threads -> channels (channel_id));
+diesel::joinable!(threads -> channels (parent_channel_id));
 diesel::joinable!(user_skill_evidence -> messages (message_id));
 diesel::joinable!(user_skills -> skills (skill_id));
 diesel::joinable!(user_skills -> vestibule_users (user_id));
