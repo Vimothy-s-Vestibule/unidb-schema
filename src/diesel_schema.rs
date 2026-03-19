@@ -79,9 +79,9 @@ diesel::table! {
 
     threads (thread_id) {
         thread_id -> Text,
-        parent_channel_id -> Text,
         name -> Text,
         thread_type -> Text,
+        parent_channel_id -> Text,
     }
 }
 
