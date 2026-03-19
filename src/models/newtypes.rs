@@ -129,3 +129,18 @@ impl FromSql<Text, Pg> for ChannelType {
         }
     }
 }
+
+impl TryFrom<serenity::model::channel::ChannelType> for ChannelType {
+    type Error = String;
+
+    fn try_from(value: serenity::model::channel::ChannelType) -> Result<Self, Self::Error> {
+        match value {
+            serenity::model::channel::ChannelType::Text => Ok(ChannelType::Text),
+            serenity::model::channel::ChannelType::Voice => Ok(ChannelType::Voice),
+            serenity::model::channel::ChannelType::PublicThread
+            | serenity::model::channel::ChannelType::PrivateThread => Ok(ChannelType::Thread),
+            serenity::model::channel::ChannelType::Forum => Ok(ChannelType::Forum),
+            _other => Err(format!("not a text channel type: {:#?}", _other)),
+        }
+    }
+}

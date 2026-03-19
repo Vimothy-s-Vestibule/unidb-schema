@@ -1,6 +1,6 @@
 [package]
 name = "unidb"
-version = "0.1.9"
+version = "0.1.10"
 edition = "2021"
 license = "MIT"
 authors = ["Creative-Difficulty"]
@@ -10,4 +10,5 @@ chrono = { version = "0.4", features = ["serde"] }
 diesel = { version = "2.3.6", features = ["postgres", "chrono", "uuid"] }
 pgvector = { version = "0.4.1", features = ["diesel"] }
 serde = { version = "1.0.228", features = ["derive"] }
+serenity = "0.12.5"
 uuid = { version = "1.22.0", features = ["v4", "serde"] }
