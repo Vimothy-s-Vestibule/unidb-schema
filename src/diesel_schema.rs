@@ -77,12 +77,11 @@ diesel::table! {
     use diesel::sql_types::*;
     use pgvector::sql_types::Vector;
 
-    user_skill_evidence (user_id, skill_id, message_id) {
-        user_id -> Text,
-        skill_id -> Uuid,
+    user_skill_evidence (user_skill_id, message_id) {
         message_id -> Text,
         weight -> Float4,
         reasoning -> Text,
+        user_skill_id -> Uuid,
     }
 }
 
@@ -90,11 +89,12 @@ diesel::table! {
     use diesel::sql_types::*;
     use pgvector::sql_types::Vector;
 
-    user_skills (user_id, skill_id) {
+    user_skills (id) {
         user_id -> Text,
         skill_id -> Uuid,
         level -> Int2,
         llm_context -> Nullable<Text>,
+        id -> Uuid,
     }
 }
 
@@ -118,6 +118,7 @@ diesel::table! {
 diesel::joinable!(messages -> channels (channel_id));
 diesel::joinable!(messages -> scores (score_id));
 diesel::joinable!(user_skill_evidence -> messages (message_id));
+diesel::joinable!(user_skill_evidence -> user_skills (user_skill_id));
 diesel::joinable!(user_skills -> skills (skill_id));
 diesel::joinable!(user_skills -> vestibule_users (user_id));
 diesel::joinable!(vestibule_users -> messages (intro_message_id));
