@@ -36,7 +36,7 @@ Using it with tokio, diesel, diesel-async:
 
 ```rust
 use unidb::diesel_schema::vestibule_users;
-use unidb::models::{DiscordMessage, RecordStatus, VestibuleUserRecord};
+use unidb::models::{DiscordMessage, VestibuleUserRecord};
 
 // ...
 let database_url = env::var("DATABASE_URL").map_err(|e| AppError::AppError(Box::new(e)))?;

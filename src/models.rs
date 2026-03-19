@@ -3,7 +3,6 @@ pub mod message;
 pub mod newtypes;
 pub mod personality;
 pub mod skill;
-pub mod thread;
 
 use diesel::prelude::*;
 
@@ -12,7 +11,6 @@ pub use message::*;
 pub use newtypes::*;
 pub use personality::*;
 pub use skill::*;
-pub use thread::*;
 
 #[derive(
     Debug,
@@ -39,7 +37,7 @@ pub struct VestibuleUserRecord {
     pub intro_message_id: Option<String>,
     // All major Acitivites/intersts over time, more general than per message, changing over time (TODO cronjob?)
     pub score_id: Option<String>,
-    pub status: RecordStatus,
+    pub score_last_updated: Option<chrono::DateTime<chrono::Utc>>,
 }
 
 #[derive(

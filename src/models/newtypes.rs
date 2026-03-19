@@ -61,42 +61,11 @@ impl std::ops::DerefMut for TextVec {
 )]
 #[diesel(sql_type = Text)]
 #[serde(rename_all = "lowercase")]
-pub enum RecordStatus {
-    #[default]
-    Pending,
-    Scored,
-}
-
-impl ToSql<Text, Pg> for RecordStatus {
-    fn to_sql<'b>(&'b self, out: &mut Output<'b, '_, Pg>) -> serialize::Result {
-        match *self {
-            RecordStatus::Pending => out.write_all(b"pending")?,
-            RecordStatus::Scored => out.write_all(b"scored")?,
-        }
-        Ok(IsNull::No)
-    }
-}
-
-impl FromSql<Text, Pg> for RecordStatus {
-    fn from_sql(bytes: diesel::pg::PgValue<'_>) -> deserialize::Result<Self> {
-        match bytes.as_bytes() {
-            b"pending" => Ok(RecordStatus::Pending),
-            b"scored" => Ok(RecordStatus::Scored),
-            _ => Err("Unrecognized enum variant".into()),
-        }
-    }
-}
-
-// -------------------------
-
-#[derive(
-    Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, AsExpression, FromSqlRow, Default,
-)]
-#[diesel(sql_type = Text)]
-#[serde(rename_all = "lowercase")]
 pub enum ChannelType {
     #[default]
     Text,
+    TextThread,
+    ForumPost,
     Voice,
     Forum,
     Stage,
@@ -111,6 +80,8 @@ impl ToSql<Text, Pg> for ChannelType {
             ChannelType::Forum => out.write_all(b"forum")?,
             ChannelType::Stage => out.write_all(b"stage")?,
             ChannelType::Category => out.write_all(b"category")?,
+            ChannelType::TextThread => out.write_all(b"text_thread")?,
+            ChannelType::ForumPost => out.write_all(b"forum_post")?,
         }
         Ok(IsNull::No)
     }
@@ -124,6 +95,9 @@ impl FromSql<Text, Pg> for ChannelType {
             b"forum" => Ok(ChannelType::Forum),
             b"stage" => Ok(ChannelType::Stage),
             b"category" => Ok(ChannelType::Category),
+            b"text_thread" => Ok(ChannelType::TextThread),
+            b"forum_post" => Ok(ChannelType::ForumPost),
+
             _other => Err(format!("not a valid channel type: {:?}", _other).into()),
         }
     }
@@ -140,49 +114,6 @@ impl TryFrom<serenity::model::channel::ChannelType> for ChannelType {
             serenity::model::channel::ChannelType::Category => Ok(ChannelType::Category),
             serenity::model::channel::ChannelType::Stage => Ok(ChannelType::Stage),
             _other => Err(format!("not a base channel type: {:?}", _other)),
-        }
-    }
-}
-
-#[derive(
-    Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, AsExpression, FromSqlRow, Default,
-)]
-#[diesel(sql_type = Text)]
-#[serde(rename_all = "lowercase")]
-pub enum ThreadType {
-    #[default]
-    TextThread,
-    ForumPost,
-}
-
-impl ToSql<Text, Pg> for ThreadType {
-    fn to_sql<'b>(&'b self, out: &mut Output<'b, '_, Pg>) -> serialize::Result {
-        match *self {
-            ThreadType::TextThread => out.write_all(b"text_thread")?,
-            ThreadType::ForumPost => out.write_all(b"forum_post")?,
-        }
-        Ok(IsNull::No)
-    }
-}
-
-impl FromSql<Text, Pg> for ThreadType {
-    fn from_sql(bytes: diesel::pg::PgValue<'_>) -> deserialize::Result<Self> {
-        match bytes.as_bytes() {
-            b"text_thread" => Ok(ThreadType::TextThread),
-            b"forum_post" => Ok(ThreadType::ForumPost),
-            _other => Err(format!("not a valid thread type: {:?}", _other).into()),
-        }
-    }
-}
-
-impl TryFrom<serenity::model::channel::ChannelType> for ThreadType {
-    type Error = String;
-
-    fn try_from(value: serenity::model::channel::ChannelType) -> Result<Self, Self::Error> {
-        match value {
-            serenity::model::channel::ChannelType::PublicThread
-            | serenity::model::channel::ChannelType::PrivateThread => Ok(ThreadType::TextThread),
-            _other => Err(format!("not a thread type: {:?}", _other)),
         }
     }
 }
