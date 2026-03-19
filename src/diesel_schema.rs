@@ -24,8 +24,9 @@ diesel::table! {
         score_id -> Nullable<Text>,
         in_reply_to -> Nullable<Text>,
         last_edited -> Nullable<Timestamptz>,
-        channel_id -> Text,
         deleted_at -> Nullable<Timestamptz>,
+        thread_id -> Nullable<Text>,
+        channel_id -> Nullable<Text>,
     }
 }
 
@@ -76,6 +77,18 @@ diesel::table! {
     use diesel::sql_types::*;
     use pgvector::sql_types::Vector;
 
+    threads (thread_id) {
+        thread_id -> Text,
+        channel_id -> Text,
+        name -> Text,
+        thread_type -> Text,
+    }
+}
+
+diesel::table! {
+    use diesel::sql_types::*;
+    use pgvector::sql_types::Vector;
+
     user_skill_evidence (user_id, skill_id, message_id) {
         user_id -> Text,
         skill_id -> Uuid,
@@ -112,8 +125,8 @@ diesel::table! {
     }
 }
 
-diesel::joinable!(messages -> channels (channel_id));
 diesel::joinable!(messages -> scores (score_id));
+diesel::joinable!(threads -> channels (channel_id));
 diesel::joinable!(user_skill_evidence -> messages (message_id));
 diesel::joinable!(user_skills -> skills (skill_id));
 diesel::joinable!(user_skills -> vestibule_users (user_id));
@@ -125,6 +138,7 @@ diesel::allow_tables_to_appear_in_same_query!(
     messages,
     scores,
     skills,
+    threads,
     user_skill_evidence,
     user_skills,
     vestibule_users,

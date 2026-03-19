@@ -3,6 +3,7 @@ pub mod message;
 pub mod newtypes;
 pub mod personality;
 pub mod skill;
+pub mod thread;
 
 use diesel::prelude::*;
 
@@ -11,6 +12,7 @@ pub use message::*;
 pub use newtypes::*;
 pub use personality::*;
 pub use skill::*;
+pub use thread::*;
 
 #[derive(
     Debug,
