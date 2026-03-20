@@ -39,6 +39,10 @@ pub struct VestibuleUserRecord {
     // All major Acitivites/intersts over time, more general than per message, changing over time (TODO cronjob?)
     pub score_id: Option<String>,
     pub score_last_updated: Option<chrono::DateTime<chrono::Utc>>,
+
+    pub intro_diagram: Option<Vec<u8>>,
+    pub current_diagram: Option<Vec<u8>>,
+    pub current_diagram_last_updated: Option<chrono::DateTime<chrono::Utc>>,
 }
 
 #[derive(
@@ -69,7 +73,4 @@ pub struct ScoreRecord {
 
     // For intro messages: Embed the whole message, for normal messages: dont generate embeddings, for users: dont generate embeddings
     pub embedding: Option<pgvector::Vector>,
-
-    pub intro_diagram: Option<Vec<u8>>,
-    pub current_diagram: Option<Vec<u8>>,
 }

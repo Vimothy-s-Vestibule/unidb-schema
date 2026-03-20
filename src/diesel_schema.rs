@@ -57,8 +57,6 @@ diesel::table! {
         activities -> Array<Nullable<Text>>,
         domains -> Array<Nullable<Text>>,
         embedding -> Nullable<Vector>,
-        intro_diagram -> Nullable<Bytea>,
-        current_diagram -> Nullable<Bytea>,
     }
 }
 
@@ -112,6 +110,9 @@ diesel::table! {
         score_id -> Nullable<Text>,
         score_last_updated -> Nullable<Timestamptz>,
         discord_display_name -> Text,
+        current_diagram -> Nullable<Bytea>,
+        current_diagram_last_updated -> Nullable<Timestamptz>,
+        intro_diagram -> Nullable<Bytea>,
     }
 }
 
