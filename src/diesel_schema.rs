@@ -75,6 +75,44 @@ diesel::table! {
     use diesel::sql_types::*;
     use pgvector::sql_types::Vector;
 
+    social_platforms (id) {
+        platform_name -> Text,
+        url -> Text,
+        id -> Uuid,
+    }
+}
+
+diesel::table! {
+    use diesel::sql_types::*;
+    use pgvector::sql_types::Vector;
+
+    user_platform_association (platform_id, association_id) {
+        association_id -> Uuid,
+        vestibule_user_id -> Text,
+        platform_username -> Text,
+        platform_display_name -> Text,
+        profile_url -> Nullable<Text>,
+        platform_association_mention_message_id -> Text,
+        reasoning -> Text,
+        platform_id -> Uuid,
+    }
+}
+
+diesel::table! {
+    use diesel::sql_types::*;
+    use pgvector::sql_types::Vector;
+
+    user_platform_association_evidence (association_id) {
+        association_id -> Uuid,
+        platform_association_mention_message_id -> Text,
+        reasoning -> Text,
+    }
+}
+
+diesel::table! {
+    use diesel::sql_types::*;
+    use pgvector::sql_types::Vector;
+
     user_skill_evidence (user_skill_id, message_id) {
         message_id -> Text,
         weight -> Float4,
@@ -118,6 +156,9 @@ diesel::table! {
 
 diesel::joinable!(messages -> channels (channel_id));
 diesel::joinable!(messages -> scores (score_id));
+diesel::joinable!(user_platform_association -> messages (platform_association_mention_message_id));
+diesel::joinable!(user_platform_association -> vestibule_users (vestibule_user_id));
+diesel::joinable!(user_platform_association -> social_platforms (platform_id));
 diesel::joinable!(user_skill_evidence -> messages (message_id));
 diesel::joinable!(user_skill_evidence -> user_skills (user_skill_id));
 diesel::joinable!(user_skills -> skills (skill_id));
@@ -130,6 +171,8 @@ diesel::allow_tables_to_appear_in_same_query!(
     messages,
     scores,
     skills,
+    social_platforms,
+    user_platform_association,
     user_skill_evidence,
     user_skills,
     vestibule_users,
