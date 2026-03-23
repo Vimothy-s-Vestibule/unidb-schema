@@ -16,7 +16,8 @@ use crate::models::newtypes::TextVec;
     QueryableByName,
     Default,
 )]
-#[diesel(table_name = crate::diesel_schema::vestibule_users)]
+#[diesel(table_name = crate::diesel_schema::scores)]
+#[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct PersonalityTraits {
     pub honesty_humility: f64,
     pub emotionality: f64,
@@ -38,7 +39,8 @@ pub struct PersonalityTraits {
     QueryableByName,
     Default,
 )]
-#[diesel(table_name = crate::diesel_schema::vestibule_users)]
+#[diesel(table_name = crate::diesel_schema::scores)]
+#[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct CommunicationTraits {
     pub agency: f64,
     pub communion: f64,
@@ -56,8 +58,9 @@ pub struct CommunicationTraits {
     QueryableByName,
     Default,
 )]
-#[diesel(table_name = crate::diesel_schema::vestibule_users)]
-pub struct Values {
+#[diesel(check_for_backend(diesel::pg::Pg))]
+#[diesel(table_name = crate::diesel_schema::scores)]
+pub struct PersonalityValues {
     pub self_direction: f64,
     pub stimulation: f64,
     pub hedonism: f64,
@@ -82,19 +85,9 @@ pub struct Values {
     QueryableByName,
     Default,
 )]
-#[diesel(table_name = crate::diesel_schema::vestibule_users)]
-pub struct Interests {
+#[diesel(check_for_backend(diesel::pg::Pg))]
+#[diesel(table_name = crate::diesel_schema::scores)]
+pub struct PersonalityInterests {
     pub domains: TextVec,
     pub activities: TextVec,
-}
-
-#[derive(Debug, Clone, Deserialize, Serialize)]
-pub struct AiScoreResponse {
-    pub username: String,
-    pub user_id: String,
-    pub personality: PersonalityTraits,
-    pub communication: CommunicationTraits,
-    pub values: Values,
-    pub interests: Interests,
-    pub introduction_embedding: Option<Vec<f32>>,
 }
