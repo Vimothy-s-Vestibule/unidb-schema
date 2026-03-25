@@ -1,37 +1,28 @@
-use diesel::prelude::*;
+use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
+use sqlx::FromRow;
 
-use crate::models::{Channel, ScoreRecord, VestibuleUserRecord};
+use super::social::ProcessingStatus;
 
-#[derive(
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    Queryable,
-    Selectable,
-    Insertable,
-    Default,
-    AsChangeset,
-    Associations,
-    Identifiable,
-)]
-#[diesel(primary_key(message_id))]
-#[diesel(table_name = crate::diesel_schema::messages)]
-#[diesel(belongs_to(VestibuleUserRecord, foreign_key = user_id))]
-#[diesel(belongs_to(ScoreRecord, foreign_key = score_id))]
-#[diesel(belongs_to(DiscordMessage, foreign_key = in_reply_to))]
-#[diesel(belongs_to(Channel, foreign_key = channel_id))]
-#[diesel(check_for_backend(diesel::pg::Pg))]
+#[derive(Debug, Clone, FromRow, Serialize, Deserialize, Default)]
 pub struct DiscordMessage {
-    pub message_id: String,
-    pub user_id: String,
+    pub message_id: i64,
+    pub channel_id: i64,
+    pub user_id: i64,
+
     pub content: String,
-    pub sent_at: chrono::DateTime<chrono::Utc>,
-    pub added_at: chrono::DateTime<chrono::Utc>,
+
+    pub sent_at: DateTime<Utc>,
+    pub added_at: DateTime<Utc>,
+    pub last_edited: Option<DateTime<Utc>>,
+    pub deleted_at: Option<DateTime<Utc>>,
+
+    pub in_reply_to: Option<i64>,
     pub score_id: Option<String>,
-    pub in_reply_to: Option<String>,
-    pub last_edited: Option<chrono::DateTime<chrono::Utc>>,
-    pub channel_id: String,
-    pub deleted_at: Option<chrono::DateTime<chrono::Utc>>,
+
+    pub triage_status: Option<ProcessingStatus>,
+    pub is_significant: Option<bool>,
+    pub skill_status: Option<ProcessingStatus>,
+    pub personality_status: Option<ProcessingStatus>,
+    pub processed_at: Option<DateTime<Utc>>,
 }

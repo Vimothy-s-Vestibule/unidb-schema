@@ -3,74 +3,61 @@ pub mod message;
 pub mod newtypes;
 pub mod personality;
 pub mod skill;
-
-use diesel::prelude::*;
+pub mod social;
 
 pub use channel::*;
 pub use message::*;
 pub use newtypes::*;
 pub use personality::*;
 pub use skill::*;
+pub use social::*;
 
-#[derive(
-    Debug,
-    Clone,
-    Queryable,
-    QueryableByName,
-    Selectable,
-    Insertable,
-    AsChangeset,
-    Default,
-    Associations,
-    Identifiable,
-)]
-#[diesel(table_name = crate::diesel_schema::vestibule_users)]
-#[diesel(primary_key(discord_user_id))]
-#[diesel(belongs_to(DiscordMessage, foreign_key = intro_message_id))]
-#[diesel(belongs_to(ScoreRecord, foreign_key = score_id))]
-#[diesel(check_for_backend(diesel::pg::Pg))]
-pub struct VestibuleUserRecord {
-    pub discord_user_id: String,
-    pub discord_username: String,
-    pub discord_display_name: String,
-    pub yt_username: Option<String>,
-    pub yt_display_name: Option<String>,
-    pub intro_message_id: Option<String>,
-    // All major Acitivites/intersts over time, more general than per message, changing over time (TODO cronjob?)
-    pub score_id: Option<String>,
-    pub score_last_updated: Option<chrono::DateTime<chrono::Utc>>,
+use chrono::{DateTime, Utc};
+use pgvector::Vector;
+use serde::{Deserialize, Serialize};
+use sqlx::{FromRow, Type};
 
-    pub intro_diagram: Option<Vec<u8>>,
-    pub current_diagram: Option<Vec<u8>>,
-    pub current_diagram_last_updated: Option<chrono::DateTime<chrono::Utc>>,
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Type, Default)]
+#[sqlx(type_name = "text", rename_all = "snake_case")]
+#[serde(rename_all = "snake_case")]
+pub enum UserStatus {
+    #[default]
+    Pending,
+    Sending,
+    Sent,
 }
 
-#[derive(
-    Debug,
-    Clone,
-    Queryable,
-    QueryableByName,
-    Selectable,
-    Insertable,
-    AsChangeset,
-    Default,
-    Identifiable,
-)]
-#[diesel(table_name = crate::diesel_schema::scores)]
-#[diesel(primary_key(score_id))]
-#[diesel(check_for_backend(diesel::pg::Pg))]
-pub struct ScoreRecord {
+#[derive(Debug, Clone, FromRow, Serialize, Deserialize, Default)]
+pub struct VestibuleUser {
+    pub discord_user_id: i64,
+    pub discord_username: String,
+    pub discord_display_name: String,
+
+    pub status: UserStatus,
+
+    pub intro_message_id: Option<i64>,
+    pub score_id: Option<String>,
+    pub score_last_updated: Option<DateTime<Utc>>,
+
+    pub current_diagram: Option<Vec<u8>>,
+    pub current_diagram_last_updated: Option<DateTime<Utc>>,
+    pub intro_diagram: Option<Vec<u8>>,
+
+    pub aggregate_interval_hours: Option<i32>,
+    pub next_aggregate_at: Option<DateTime<Utc>>,
+    pub last_aggregated_at: Option<DateTime<Utc>>,
+}
+
+#[derive(Debug, Clone, FromRow, Serialize, Deserialize, Default)]
+pub struct Score {
     pub score_id: String,
 
-    #[diesel(embed)]
-    pub personality: PersonalityTraits,
-    #[diesel(embed)]
-    pub communication: CommunicationTraits,
-    #[diesel(embed)]
-    pub values: PersonalityValues,
-    #[diesel(embed)]
-    pub interests: PersonalityInterests,
+    #[sqlx(flatten)]
+    pub hexaco: HexacoTraits,
 
-    // For intro messages: Embed the whole message, for normal messages: dont generate embeddings, for users: dont generate embeddings
-    pub embedding: Option<pgvector::Vector>,
+    #[sqlx(flatten)]
+    pub behavioral: BehavioralTraits,
+
+    #[serde(skip)]
+    pub embedding: Option<Vector>,
 }

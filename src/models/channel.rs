@@ -1,13 +1,12 @@
-use diesel::prelude::*;
+use serde::{Deserialize, Serialize};
+use sqlx::FromRow;
 
-use crate::models::ChannelType;
+use crate::models::DiscordChannelType;
 
-#[derive(Debug, Clone, Queryable, Selectable, Insertable, Default, AsChangeset, Identifiable)]
-#[diesel(primary_key(channel_id))]
-#[diesel(table_name = crate::diesel_schema::channels)]
-#[diesel(check_for_backend(diesel::pg::Pg))]
-pub struct Channel {
-    pub channel_id: String,
+#[derive(Debug, Clone, FromRow, Serialize, Deserialize, Default)]
+pub struct DiscordChannel {
+    pub channel_id: i64,
     pub name: String,
-    pub channel_type: ChannelType,
+    pub channel_type: DiscordChannelType,
+    pub parent_channel_id: Option<i64>,
 }

@@ -1,45 +1,35 @@
-use diesel::prelude::*;
+use pgvector::Vector;
+use serde::{Deserialize, Serialize};
+use sqlx::FromRow;
 use uuid::Uuid;
 
-use crate::models::message::DiscordMessage;
-use crate::models::VestibuleUserRecord;
-
-#[derive(Debug, Clone, Queryable, Selectable, Insertable, AsChangeset, Identifiable)]
-#[diesel(table_name = crate::diesel_schema::skills)]
-#[diesel(check_for_backend(diesel::pg::Pg))]
+/// Skill definition
+#[derive(Debug, Clone, FromRow, Serialize, Deserialize)]
 pub struct Skill {
     pub id: Uuid,
     pub name: String,
-    pub embedding: Option<pgvector::Vector>,
+    #[serde(skip)]
+    pub embedding: Option<Vector>,
 }
 
-#[derive(
-    Debug, Clone, Queryable, Selectable, Insertable, AsChangeset, Associations, Identifiable,
-)]
-#[diesel(table_name = crate::diesel_schema::user_skills)]
-#[diesel(belongs_to(VestibuleUserRecord, foreign_key = user_id))]
-#[diesel(belongs_to(Skill, foreign_key = skill_id))]
-#[diesel(primary_key(id))]
-#[diesel(check_for_backend(diesel::pg::Pg))]
+/// User's proficiency in a skill
+#[derive(Debug, Clone, FromRow, Serialize, Deserialize)]
 pub struct UserSkill {
     pub id: Uuid,
-    pub user_id: String,
+    pub user_id: i64,
     pub skill_id: Uuid,
+    /// Skill level 0-10
     pub level: i16,
+    /// LLM reasoning context
     pub llm_context: Option<String>,
 }
 
-#[derive(
-    Debug, Clone, Queryable, Selectable, Insertable, AsChangeset, Associations, Identifiable,
-)]
-#[diesel(table_name = crate::diesel_schema::user_skill_evidence)]
-#[diesel(belongs_to(UserSkill, foreign_key = user_skill_id))]
-#[diesel(belongs_to(DiscordMessage, foreign_key = message_id))]
-#[diesel(primary_key(user_skill_id, message_id))]
-#[diesel(check_for_backend(diesel::pg::Pg))]
+/// Evidence linking a message to a skill assessment
+#[derive(Debug, Clone, FromRow, Serialize, Deserialize)]
 pub struct UserSkillEvidence {
     pub user_skill_id: Uuid,
-    pub message_id: String,
+    pub message_id: i64,
+    /// How strongly this message supports the skill assessment
     pub weight: f32,
     pub reasoning: String,
 }
