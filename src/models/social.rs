@@ -16,10 +16,11 @@ pub enum SyncStatus {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Type, Default)]
 #[sqlx(type_name = "text", rename_all = "snake_case")]
 #[serde(rename_all = "snake_case")]
-pub enum AccessType {
+pub enum PlatformDataAccessPolicy {
     #[default]
     Public,
     OauthRequired,
+    // Means: There is no API but people still mentioned an account they have on this platform
     Unavailable,
 }
 
@@ -28,7 +29,7 @@ pub struct SocialPlatform {
     pub id: Uuid,
     pub platform_name: String,
     pub homepage: String,
-    pub access_type: AccessType,
+    pub access: PlatformDataAccessPolicy,
 }
 
 #[derive(Debug, Clone, FromRow, Serialize, Deserialize)]

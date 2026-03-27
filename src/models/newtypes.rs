@@ -25,7 +25,10 @@ impl TryFrom<serenity::model::channel::ChannelType> for DiscordChannelType {
             serenity::model::channel::ChannelType::Forum => Ok(DiscordChannelType::Forum),
             serenity::model::channel::ChannelType::Category => Ok(DiscordChannelType::Category),
             serenity::model::channel::ChannelType::Stage => Ok(DiscordChannelType::Stage),
-            other => Err(format!("unsupported channel type: {:?}", other)),
+            other => Err(format!(
+                "cannot convert unsupported serenity discord channel type: {:?}",
+                other
+            )),
         }
     }
 }

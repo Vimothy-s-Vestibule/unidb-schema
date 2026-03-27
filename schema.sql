@@ -2,7 +2,6 @@
 -- UniDB Schema
 -- Run against a blank PostgreSQL database to initialize all tables
 -- Tables are ordered to satisfy foreign key dependencies
--- TODO make the LLM relfect on the comments in this schema so it knows what it is even grading by.
 -- ============================================================================
 
 -- Load vector extension
@@ -18,121 +17,62 @@ SET search_path TO public;
 CREATE TABLE scores (
   score_id text PRIMARY KEY,
 
-  -- ============================================================================
-  -- HEXACO PERSONALITY TRAITS (0.0 - 1.0 scale)
-  -- Based on the HEXACO model of personality structure, some additional fields added for experimentation
-  -- ============================================================================
-
-  -- HEXACO Honesty-Humility: Sincerity, fairness, lack of greed/entitlement.
-  -- High: Genuine, doesn't manipulate or exploit, modest, not status-driven
-  -- Low: Flatters for gain, bends rules for advantage, feels entitled, status-seeking
+  -- HEXACO
   honesty double precision NOT NULL,
-
-  -- HEXACO Emotionality: Emotional reactivity, volatility, anxiety.
-  -- High: Gets heated easily, expresses strong emotions, anxious, reactive to stress
-  -- Low: Calm under pressure, emotionally stable, rarely gets worked up
   emotionality double precision NOT NULL,
-
-  -- HEXACO Extraversion: Social confidence, enthusiasm, enjoyment of interaction.
-  -- High: Initiates conversations, energetic, confident, enjoys group discussions
-  -- Low: Quiet, reserved, avoids spotlight, prefers observing over participating
   extraversion double precision NOT NULL,
-
-  -- HEXACO Agreeableness: Forgiveness, gentleness, patience, willingness to compromise.
-  -- High: Lets slights go, avoids conflict, patient with others, flexible
-  -- Low: Holds grudges, critical, quick to argue, stubborn in disagreements
   agreeableness double precision NOT NULL,
-
-  -- HEXACO Conscientiousness: Organization, diligence, perfectionism, prudence.
-  -- High: Plans carefully, thorough, disciplined, considers consequences
-  -- Low: Disorganized, impulsive, cuts corners, acts without planning
   conscientiousness double precision NOT NULL,
-
-  -- HEXACO Openness: Curiosity, creativity, aesthetic appreciation, unconventionality.
-  -- High: Explores ideas, appreciates art/beauty, creative, embraces unusual concepts
-  -- Low: Practical-focused, conventional, uninterested in abstract/artistic topics
   openness_to_experience double precision NOT NULL,
 
-
-  -- Agency: Follow-through on stated commitments and self-initiated action.
-  -- High: Does what they say, self-directed, drives progress and works on projects proactively
-  -- Low: Makes promises but doesn't deliver, passive, waits for others
+ -- Other interesting traits
   agency double precision NOT NULL,
-
-  -- Achievement: Track record of completed, impactful projects or accomplishments.
-  -- High: Has shipped projects, can point to concrete outcomes
-  -- Low: Many started projects, few finished; talks about ideas without execution
   achievement double precision NOT NULL,
-
-  -- Influence: Social influence and authority in conversations (behavioral, not role-based).
-  -- High: Others defer to their opinions, shapes discussion direction, respected
-  -- Low: Opinions ignored, follows rather than leads discussions
   influence double precision NOT NULL,
-
-  -- Sarcasm: Frequency and intensity of ironic/sarcastic communication.
-  -- High: Often says the opposite of what they mean, dry humor, mocking tone
-  -- Low: Direct, literal communication, rare irony
   sarcasm double precision NOT NULL,
-
-  -- Security (self-confidence): Certainty vs. self-doubt in communication.
-  -- High: Confident assertions, rarely hedges, owns their opinions
-  -- Low: Frequently hedges ("I think maybe..."), seeks validation, self-deprecating
   security double precision NOT NULL,
-
-  -- Self-reflection: Explicit reconsideration of own beliefs, decisions, or growth.
-  -- High: "I used to think X but now...", acknowledges mistakes, updates views
-  -- Low: Never revisits past positions, doesn't discuss personal growth
-  -- Note: Distinguish from insecurity—self-reflection is about growth, not doubt
   self_reflection double precision NOT NULL,
-
-  -- Technical competence: Quality of technical reasoning/solutions demonstrated.
-  -- High: Correct, nuanced technical explanations; solves problems efficiently
-  -- Low: Frequent errors, surface-level understanding, needs correction often
   technical_competence double precision NOT NULL,
-
-  -- Busyness: How occupied the person appears with projects, work, or life obligations.
-  -- High: Frequently mentions being busy, many concurrent commitments, limited availability
-  -- Low: Appears to have free time, few mentioned obligations, readily available
   busyness double precision NOT NULL,
 
-
-  -- Vector embedding for personality similarity search
   embedding vector
 );
 
 CREATE TABLE channels (
   channel_id bigint PRIMARY KEY,
   name text NOT NULL,
-  -- discord channel type: text, voice, forum, text_thread, forum_post, stage, category
+  -- discord channel type: text, text_thread, forum_post, voice, forum, stage, category
   channel_type text NOT NULL,
   parent_channel_id bigint REFERENCES channels(channel_id)
 );
 
 CREATE TABLE skills (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  id uuid PRIMARY KEY,
+
   name text NOT NULL UNIQUE,
-  -- Vector embedding for skill similarity
+
+  -- for skill similarity
   embedding vector
 );
 
 CREATE TABLE social_platforms (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  id uuid PRIMARY KEY,
   platform_name text NOT NULL UNIQUE,
+  -- URL: https://strava.com https://spotify.com https://linkedin.com ...
   homepage text NOT NULL,
   -- public: can fetch with username only, oauth_required: needs user auth, unavailable: no API access
-  access_type text NOT NULL DEFAULT 'public'
+  access_type text NOT NULL
 );
 
--- ============================================================================
--- MESSAGES TABLE
--- Depends on: channels, scores
--- ============================================================================
 
+
+-- Depends on: channels, scores
 CREATE TABLE messages (
   message_id bigint PRIMARY KEY,
   channel_id bigint NOT NULL REFERENCES channels(channel_id),
 
-  user_id bigint NOT NULL,
+  sent_by bigint,
+
   content text NOT NULL,
 
   sent_at timestamptz NOT NULL,
@@ -146,43 +86,56 @@ CREATE TABLE messages (
   -- LLM personality score for only this message
   score_id text REFERENCES scores(score_id),
 
-  -- Processing pipeline status
-  triage_status text DEFAULT 'pending',    -- pending/processing/complete/skipped/failed
-  is_significant boolean,
-  skill_status text,                        -- NULL/pending/processing/complete/failed
-  personality_status text,                  -- NULL/pending/processing/complete/failed
+  -- Processing pipeline metadata
+  triage_status text DEFAULT 'pending',    -- pending: Will be processed/processing: A worker is curretly processing this messaage and the status will change soon/complete: The message has been processed (terminal)/skipped: Message is insignificant (skipped, terminal)/failed: Will be retried when a cleanup job is run on the db
+ -- |
+ -- |
+ -- ⌄
+  is_significant boolean, -- Whether an LLM should score and extract personality from it, this field is also being set by an LLM TODO
+ -- |
+ -- |
+ -- ⌄
+  skills_status text, -- NULL: insignificant for skills/pending: Will be processed/processing: A worker is curretly processing this messaage and the status will change soon/complete: The message has been processed (terminal)/skipped: Message is insignificant (skipped, terminal)/failed: Will be retried when a cleanup job is run on the db
+  personality_status text, -- NULL: insignificant for persinality extraction/pending: Will be processed/processing: A worker is curretly processing this messaage and the status will change soon/complete: The message has been processed (terminal)/skipped: Message is insignificant (skipped, terminal)/failed: Will be retried when a cleanup job is run on the db
+  -- TODO make it so admins can manually override messages to be included/excluded from skills or personality processing
   processed_at timestamptz
 );
 
--- ============================================================================
+-- 
 -- VESTIBULE USERS TABLE
--- Depends on: messages, scores
--- ============================================================================
-
+-- Depends on: messages, scores 
 CREATE TABLE vestibule_users (
-  discord_user_id bigint PRIMARY KEY,
-  discord_username text NOT NULL UNIQUE,
-  discord_display_name text NOT NULL,
-
-  -- pending/sending/sent
-  status text NOT NULL,
+  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  discord_user_id bigint REFERENCES discord_accounts(discord_user_id),
 
   intro_message_id bigint REFERENCES messages(message_id),
 
-  -- Aggregated personality score
+  -- Aggregated personality scores
   score_id text REFERENCES scores(score_id),
   score_last_updated timestamptz,
 
-  -- Generated diagram images
+  -- Generated HEXACO diagram images
   current_diagram bytea,
   current_diagram_last_updated timestamptz,
-  intro_diagram bytea,
 
-  -- Periodic aggregation scheduling
-  aggregate_interval_hours int DEFAULT 24,
-  next_aggregate_at timestamptz,
-  last_aggregated_at timestamptz
+  intro_diagram bytea
 );
+
+CREATE TABLE discord_accounts (
+  discord_user_id bigint PRIMARY KEY,
+
+  vestibule_user_id uuid NOT NULL REFERENCES vestibule_users(id),
+
+  username text NOT NULL UNIQUE,
+
+  display_name text NOT NULL,
+
+  score_last_updated timestamptz DEFAULT NOW,
+);
+
+ALTER TABLE messages 
+  ADD CONSTRAINT fk_messages_sent_by 
+  FOREIGN KEY (sent_by) REFERENCES discord_accounts(discord_user_id);
 
 -- ============================================================================
 -- USER SKILLS TABLE
@@ -315,10 +268,10 @@ CREATE TABLE user_activities (
 -- ============================================================================
 
 -- Messages: common query patterns
-CREATE INDEX idx_messages_user_id ON messages(user_id);
+CREATE INDEX idx_messages_user_id ON messages(sent_by);
 CREATE INDEX idx_messages_channel_id ON messages(channel_id);
 CREATE INDEX idx_messages_sent_at ON messages(sent_at DESC);
-CREATE INDEX idx_messages_user_sent ON messages(user_id, sent_at DESC);
+CREATE INDEX idx_messages_user_sent ON messages(sent_by, sent_at DESC);
 CREATE INDEX idx_messages_channel_sent ON messages(channel_id, sent_at DESC);
 
 -- Partial index for non-deleted messages
@@ -355,15 +308,11 @@ CREATE INDEX idx_user_activities_user ON user_activities(user_id);
 CREATE INDEX idx_user_activities_type ON user_activities(user_id, activity_type);
 CREATE INDEX idx_user_activities_occurred ON user_activities(user_id, occurred_at DESC);
 
--- User aggregation scheduling
-CREATE INDEX idx_users_aggregate_due ON vestibule_users(next_aggregate_at)
-  WHERE next_aggregate_at IS NOT NULL;
-
 -- Vector similarity search (HNSW index)
-CREATE INDEX idx_scores_embedding ON scores
-  USING hnsw (embedding vector_cosine_ops)
-  WHERE embedding IS NOT NULL;
+-- CREATE INDEX idx_scores_embedding ON scores
+--   USING hnsw (embedding vector_cosine_ops)
+--   WHERE embedding IS NOT NULL;
 
-CREATE INDEX idx_skills_embedding ON skills
-  USING hnsw (embedding vector_cosine_ops)
-  WHERE embedding IS NOT NULL;
+-- CREATE INDEX idx_skills_embedding ON skills
+--   USING hnsw (embedding vector_cosine_ops)
+--   WHERE embedding IS NOT NULL;
