@@ -15,7 +15,7 @@ SET search_path TO public;
 -- ============================================================================
 
 CREATE TABLE scores (
-  score_id text PRIMARY KEY,
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
 
   -- HEXACO
   honesty double precision NOT NULL,
@@ -84,7 +84,7 @@ CREATE TABLE messages (
   in_reply_to bigint REFERENCES messages(message_id),
 
   -- LLM personality score for only this message
-  score_id text REFERENCES scores(score_id),
+  score_id uuid REFERENCES scores(id),
 
   -- Processing pipeline metadata
   triage_status text DEFAULT 'pending',    -- pending: Will be processed/processing: A worker is curretly processing this messaage and the status will change soon/complete: The message has been processed (terminal)/skipped: Message is insignificant (skipped, terminal)/failed: Will be retried when a cleanup job is run on the db
@@ -95,23 +95,28 @@ CREATE TABLE messages (
  -- |
  -- |
  -- ⌄
-  skills_status text, -- NULL: insignificant for skills/pending: Will be processed/processing: A worker is curretly processing this messaage and the status will change soon/complete: The message has been processed (terminal)/skipped: Message is insignificant (skipped, terminal)/failed: Will be retried when a cleanup job is run on the db
+  skill_status text, -- NULL: insignificant for skills/pending: Will be processed/processing: A worker is curretly processing this messaage and the status will change soon/complete: The message has been processed (terminal)/skipped: Message is insignificant (skipped, terminal)/failed: Will be retried when a cleanup job is run on the db
   personality_status text, -- NULL: insignificant for persinality extraction/pending: Will be processed/processing: A worker is curretly processing this messaage and the status will change soon/complete: The message has been processed (terminal)/skipped: Message is insignificant (skipped, terminal)/failed: Will be retried when a cleanup job is run on the db
   -- TODO make it so admins can manually override messages to be included/excluded from skills or personality processing
   processed_at timestamptz
 );
 
--- 
--- VESTIBULE USERS TABLE
--- Depends on: messages, scores 
+-- ============================================================================
+-- VESTIBULE USERS TABLE (canonical user entity)
+-- A user can have 0 or many Discord accounts
+-- ============================================================================
+
 CREATE TABLE vestibule_users (
-  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
-  discord_user_id bigint REFERENCES discord_accounts(discord_user_id),
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
 
-  intro_message_id bigint REFERENCES messages(message_id),
+  real_first text,
+  real_last text,
+  nickname text,
 
-  -- Aggregated personality scores
-  score_id text REFERENCES scores(score_id),
+  intro_message_id bigint,  -- FK added via ALTER TABLE after messages exists
+
+  -- Aggregated personality scores from all messages
+  score_id uuid REFERENCES scores(id),
   score_last_updated timestamptz,
 
   -- Generated HEXACO diagram images
@@ -121,21 +126,26 @@ CREATE TABLE vestibule_users (
   intro_diagram bytea
 );
 
+-- ============================================================================
+-- DISCORD ACCOUNTS TABLE
+-- Many-to-one: multiple discord accounts can belong to one vestibule_user
+-- ============================================================================
+
 CREATE TABLE discord_accounts (
   discord_user_id bigint PRIMARY KEY,
-
-  vestibule_user_id uuid NOT NULL REFERENCES vestibule_users(id),
-
+  vestibule_user_id uuid NOT NULL REFERENCES vestibule_users(id) ON DELETE CASCADE,
   username text NOT NULL UNIQUE,
-
-  display_name text NOT NULL,
-
-  score_last_updated timestamptz DEFAULT NOW,
+  display_name text NOT NULL
 );
 
 ALTER TABLE messages 
   ADD CONSTRAINT fk_messages_sent_by 
   FOREIGN KEY (sent_by) REFERENCES discord_accounts(discord_user_id);
+
+-- Add FK from vestibule_users to messages (resolves circular dependency)
+ALTER TABLE vestibule_users
+  ADD CONSTRAINT fk_vestibule_users_intro_message
+  FOREIGN KEY (intro_message_id) REFERENCES messages(message_id);
 
 -- ============================================================================
 -- USER SKILLS TABLE
@@ -145,7 +155,7 @@ ALTER TABLE messages
 CREATE TABLE user_skills (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
 
-  user_id bigint NOT NULL REFERENCES vestibule_users(discord_user_id),
+  user_id uuid NOT NULL REFERENCES vestibule_users(id) ON DELETE CASCADE,
   skill_id uuid NOT NULL REFERENCES skills(id),
 
   -- Skill level 0-10
@@ -182,7 +192,7 @@ CREATE TABLE user_skill_evidence (
 CREATE TABLE user_platform_association (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
 
-  vestibule_user_id bigint NOT NULL REFERENCES vestibule_users(discord_user_id),
+  vestibule_user_id uuid NOT NULL REFERENCES vestibule_users(id) ON DELETE CASCADE,
   platform_id uuid NOT NULL REFERENCES social_platforms(id),
 
   platform_username text NOT NULL,
@@ -190,18 +200,18 @@ CREATE TABLE user_platform_association (
   profile_url text,
 
   -- Message where this association was mentioned/discovered
-  platform_association_mention_message_id bigint NOT NULL REFERENCES messages(message_id),
+  platform_association_mention_message_id bigint REFERENCES messages(message_id),
+  -- Reasoning for linking this user to this platform, TODO can be overriden to manually add associations by admins
   reasoning text NOT NULL,
 
   -- Sync scheduling
-  sync_interval_hours int DEFAULT 24,
-  next_sync_at timestamptz DEFAULT NOW(),
   last_synced_at timestamptz,
-  sync_status text DEFAULT 'idle',         -- idle/running/failed
   last_sync_error text,
+  sync_status text DEFAULT 'idle',         -- idle/running/failed
 
   -- Prevent duplicate user-platform combinations
-  UNIQUE (vestibule_user_id, platform_id)
+  UNIQUE (vestibule_user_id, platform_id),
+  CHECK (platform_association_mention_message_id IS NOT NULL OR reasoning IS NOT NULL)
 );
 
 -- ============================================================================
@@ -209,9 +219,9 @@ CREATE TABLE user_platform_association (
 -- Raw data fetched from external platforms (upserted on external_id)
 -- Depends on: user_platform_association
 -- ============================================================================
-
 CREATE TABLE external_content (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  -- This is also the reason for fetching
   platform_association_id uuid NOT NULL REFERENCES user_platform_association(id),
 
   content_type text NOT NULL,              -- 'github_repo', 'strava_activity', 'linkedin_post', 'spotify_track'
@@ -223,13 +233,6 @@ CREATE TABLE external_content (
   fetched_at timestamptz DEFAULT NOW(),
   updated_at timestamptz DEFAULT NOW(),
 
-  -- Processing pipeline status (same as messages)
-  triage_status text DEFAULT 'pending',
-  is_significant boolean,
-  skill_status text,
-  personality_status text,
-  processed_at timestamptz,
-
   UNIQUE (platform_association_id, content_type, external_id)
 );
 
@@ -237,18 +240,17 @@ CREATE TABLE external_content (
 -- USER ACTIVITIES TABLE
 -- LLM-extracted activities from messages and external content (immutable)
 -- Depends on: vestibule_users, external_content, messages
+-- TODO make it so admins can manually add activites
 -- ============================================================================
-
 CREATE TABLE user_activities (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id bigint NOT NULL REFERENCES vestibule_users(discord_user_id),
+  user_id uuid NOT NULL REFERENCES vestibule_users(id) ON DELETE CASCADE,
 
-  -- What kind of activity: 'run', 'commit', 'job', 'listen', 'skill', 'project', etc.
+  -- What kind of activity: 'run', 'cycle', 'swim', 'git_commit', 'took_job', 'add_experience', 'linkedin_post', 'song_listen', 'podcast_listen', 'skill', 'project', '' etc.
   activity_type text NOT NULL,
-  -- Human-readable summary: "10km marathon", "rust-analyzer contribution", "Senior Engineer at Google"
+  -- Human-readable summary: "10km marathon", "rust-analyzer contribution", "Took job as Senior Engineer at Google"
   label text NOT NULL,
-  -- Type-specific structured data (distance_km, repo_url, company, track_id, etc.)
-  data jsonb,
+
   -- When the activity happened (not when extracted)
   occurred_at timestamptz,
 
@@ -256,9 +258,7 @@ CREATE TABLE user_activities (
   external_content_id uuid REFERENCES external_content(id),
   message_id bigint REFERENCES messages(message_id),
 
-  confidence real,
   reasoning text,
-  extracted_at timestamptz DEFAULT NOW(),
 
   CHECK (external_content_id IS NOT NULL OR message_id IS NOT NULL)
 );
@@ -267,12 +267,16 @@ CREATE TABLE user_activities (
 -- INDEXES
 -- ============================================================================
 
+-- Discord accounts
+CREATE INDEX idx_discord_accounts_user ON discord_accounts(vestibule_user_id);
+
 -- Messages: common query patterns
-CREATE INDEX idx_messages_user_id ON messages(sent_by);
+CREATE INDEX idx_messages_sent_by ON messages(sent_by);
 CREATE INDEX idx_messages_channel_id ON messages(channel_id);
 CREATE INDEX idx_messages_sent_at ON messages(sent_at DESC);
 CREATE INDEX idx_messages_user_sent ON messages(sent_by, sent_at DESC);
 CREATE INDEX idx_messages_channel_sent ON messages(channel_id, sent_at DESC);
+CREATE INDEX idx_messages_in_reply_to ON messages(in_reply_to) WHERE in_reply_to IS NOT NULL;
 
 -- Partial index for non-deleted messages
 CREATE INDEX idx_messages_active ON messages(channel_id, sent_at DESC)
@@ -293,15 +297,6 @@ CREATE INDEX idx_user_skills_user_id ON user_skills(user_id);
 CREATE INDEX idx_user_platform_association_user_id ON user_platform_association(vestibule_user_id);
 CREATE INDEX idx_user_platform_sync_due ON user_platform_association(next_sync_at)
   WHERE sync_status = 'idle';
-
--- External content processing
-CREATE INDEX idx_external_content_platform ON external_content(platform_association_id);
-CREATE INDEX idx_external_content_triage_pending ON external_content(fetched_at)
-  WHERE triage_status = 'pending';
-CREATE INDEX idx_external_content_skill_pending ON external_content(fetched_at)
-  WHERE skill_status = 'pending';
-CREATE INDEX idx_external_content_personality_pending ON external_content(fetched_at)
-  WHERE personality_status = 'pending';
 
 -- User activities
 CREATE INDEX idx_user_activities_user ON user_activities(user_id);
