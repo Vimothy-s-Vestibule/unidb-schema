@@ -142,7 +142,36 @@ ALTER TABLE messages
   ADD CONSTRAINT fk_messages_sent_by 
   FOREIGN KEY (sent_by) REFERENCES discord_accounts(discord_user_id);
 
--- Add FK from vestibule_users to messages (resolves circular dependency)
+-- ============================================================================
+-- MESSAGE REACTIONS TABLE
+-- Tracks emoji reactions on Discord messages
+-- Depends on: messages, discord_accounts
+-- ============================================================================
+
+CREATE TABLE message_reactions (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  message_id bigint NOT NULL REFERENCES messages(message_id) ON DELETE CASCADE,
+  user_id bigint NOT NULL REFERENCES discord_accounts(discord_user_id) ON DELETE CASCADE,
+
+  -- Unicode emoji string or custom emoji snowflake ID
+  emoji text NOT NULL,
+  -- Display name (useful for custom emojis)
+  emoji_name text,
+  -- Whether this is a custom emoji (vs unicode)
+  is_custom boolean NOT NULL DEFAULT false,
+  -- Whether custom emoji is animated (GIF vs PNG) - only relevant when is_custom = true
+  is_animated boolean NOT NULL DEFAULT false,
+  -- CDN URL for custom emojis (NULL for unicode emojis)
+  -- Format: https://cdn.discordapp.com/emojis/{id}.{png|gif}
+  emoji_url text,
+
+  reacted_at timestamptz NOT NULL DEFAULT NOW(),
+
+  -- Prevent duplicate reactions (same user, same emoji, same message)
+  UNIQUE (message_id, user_id, emoji)
+);
+
+-- Add FK from vestibule_users to messages
 ALTER TABLE vestibule_users
   ADD CONSTRAINT fk_vestibule_users_intro_message
   FOREIGN KEY (intro_message_id) REFERENCES messages(message_id);
@@ -270,7 +299,11 @@ CREATE TABLE user_activities (
 -- Discord accounts
 CREATE INDEX idx_discord_accounts_user ON discord_accounts(vestibule_user_id);
 
--- Messages: common query patterns
+-- Message reactions
+CREATE INDEX idx_message_reactions_message ON message_reactions(message_id);
+CREATE INDEX idx_message_reactions_user ON message_reactions(user_id);
+
+-- Messages: common queries
 CREATE INDEX idx_messages_sent_by ON messages(sent_by);
 CREATE INDEX idx_messages_channel_id ON messages(channel_id);
 CREATE INDEX idx_messages_sent_at ON messages(sent_at DESC);

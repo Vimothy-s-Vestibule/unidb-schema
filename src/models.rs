@@ -2,6 +2,7 @@ pub mod channel;
 pub mod message;
 pub mod newtypes;
 pub mod personality;
+pub mod reaction;
 pub mod skill;
 pub mod social;
 
@@ -9,6 +10,7 @@ pub use channel::*;
 pub use message::*;
 pub use newtypes::*;
 pub use personality::*;
+pub use reaction::*;
 pub use skill::*;
 pub use social::*;
 
