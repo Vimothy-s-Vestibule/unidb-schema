@@ -1,9 +1,0 @@
--- This file should undo anything in `up.sql`
-
-ALTER DEFAULT PRIVILEGES IN SCHEMA public REVOKE SELECT, INSERT, UPDATE, DELETE ON TABLES FROM "krauzekrap";
-
-REVOKE SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public FROM "krauzekrap";
-
-REVOKE USAGE ON SCHEMA public FROM "krauzekrap";
-
-GRANT ALL PRIVILEGES ON SCHEMA public TO "krauzekrap";

@@ -1,4 +1,8 @@
--- Add message_reactions table for tracking emoji reactions on Discord messages
+-- ============================================================================
+-- MESSAGE REACTIONS TABLE
+-- Tracks emoji reactions on Discord messages
+-- Depends on: messages, discord_accounts
+-- ============================================================================
 
 CREATE TABLE message_reactions (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -23,5 +27,7 @@ CREATE TABLE message_reactions (
   UNIQUE (message_id, user_id, emoji)
 );
 
-CREATE INDEX idx_message_reactions_message ON message_reactions(message_id);
-CREATE INDEX idx_message_reactions_user ON message_reactions(user_id);
+-- Add FK from vestibule_users to messages (deferred due to circular dependency)
+ALTER TABLE vestibule_users
+  ADD CONSTRAINT fk_vestibule_users_intro_message
+  FOREIGN KEY (intro_message_id) REFERENCES messages(message_id);

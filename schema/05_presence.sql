@@ -1,8 +1,7 @@
--- Add user presence tracking tables (event-sourced)
-
 -- ============================================================================
 -- USER PRESENCE TABLE
--- Tracks Discord online/offline status changes
+-- Tracks Discord online/offline status changes (event-sourced)
+-- Depends on: discord_accounts
 -- ============================================================================
 
 CREATE TABLE user_presence (
@@ -27,6 +26,8 @@ CREATE TABLE user_presence (
 -- ============================================================================
 -- USER PRESENCE ACTIVITIES TABLE
 -- Tracks rich presence / activities (games, Spotify, streaming, etc.)
+-- Event-sourced: only insert when activity starts, update ended_at when it ends
+-- Depends on: discord_accounts
 -- ============================================================================
 
 CREATE TABLE user_presence_activities (
@@ -61,6 +62,7 @@ CREATE TABLE user_presence_activities (
 -- ============================================================================
 -- FORCED ONLINE EVIDENCE TABLE
 -- Links messages sent while user showed as offline/invisible
+-- Depends on: discord_accounts, messages, user_presence
 -- ============================================================================
 
 CREATE TABLE forced_online_evidence (
@@ -76,22 +78,3 @@ CREATE TABLE forced_online_evidence (
 
   detected_at timestamptz NOT NULL DEFAULT NOW()
 );
-
--- ============================================================================
--- INDEXES
--- ============================================================================
-
--- User presence: current status per user
-CREATE INDEX idx_presence_current ON user_presence(user_id) WHERE ended_at IS NULL;
--- User presence: historical queries "who was online at time X"
-CREATE INDEX idx_presence_history ON user_presence(user_id, started_at, ended_at);
--- User presence: time-based queries
-CREATE INDEX idx_presence_time ON user_presence(started_at DESC);
-
--- User presence activities: current activities per user
-CREATE INDEX idx_presence_activities_current ON user_presence_activities(user_id) WHERE ended_at IS NULL;
--- User presence activities: historical queries
-CREATE INDEX idx_presence_activities_history ON user_presence_activities(user_id, started_at DESC);
-
--- Forced online evidence
-CREATE INDEX idx_forced_online_user ON forced_online_evidence(user_id, detected_at DESC);

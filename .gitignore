@@ -26,3 +26,6 @@ target/# Python-generated files
 
 # VSCode
 **/.vscode/
+
+# The full schema is just the final product, the individual parts of it are stored in schema/
+schema.sql
