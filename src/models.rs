@@ -1,67 +1,37 @@
+//! Database models for UniDB.
+//!
+//! # Module Organization
+//!
+//! - [`enums`] - All database TEXT enums
+//! - [`user`] - VestibuleUser, DiscordAccount
+//! - [`channel`] - Discord channels
+//! - [`message`] - Discord messages
+//! - [`reaction`] - Message reactions
+//! - [`presence`] - Online status and activities
+//! - [`score`] - HEXACO and behavioral traits
+//! - [`skill`] - Skills and evidence
+//! - [`platform`] - External platform integrations
+//! - [`activity`] - LLM-extracted activities
+
+pub mod activity;
 pub mod channel;
+pub mod enums;
 pub mod message;
-pub mod newtypes;
-pub mod personality;
+pub mod platform;
 pub mod presence;
 pub mod reaction;
+pub mod score;
 pub mod skill;
-pub mod social;
+pub mod user;
 
-pub use channel::*;
-pub use message::*;
-pub use newtypes::*;
-pub use personality::*;
-pub use presence::*;
-pub use reaction::*;
-pub use skill::*;
-pub use social::*;
-
-use chrono::{DateTime, Utc};
-use pgvector::Vector;
-use serde::{Deserialize, Serialize};
-use sqlx::{FromRow, Type};
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Type, Default)]
-#[sqlx(type_name = "text", rename_all = "snake_case")]
-#[serde(rename_all = "snake_case")]
-pub enum UserStatus {
-    #[default]
-    Pending,
-    Sending,
-    Sent,
-}
-
-#[derive(Debug, Clone, FromRow, Serialize, Deserialize, Default)]
-pub struct VestibuleUser {
-    pub discord_user_id: i64,
-    pub discord_username: String,
-    pub discord_display_name: String,
-
-    pub status: UserStatus,
-
-    pub intro_message_id: Option<i64>,
-    pub score_id: Option<String>,
-    pub score_last_updated: Option<DateTime<Utc>>,
-
-    pub current_diagram: Option<Vec<u8>>,
-    pub current_diagram_last_updated: Option<DateTime<Utc>>,
-    pub intro_diagram: Option<Vec<u8>>,
-
-    pub aggregate_interval_hours: Option<i32>,
-    pub next_aggregate_at: Option<DateTime<Utc>>,
-    pub last_aggregated_at: Option<DateTime<Utc>>,
-}
-
-#[derive(Debug, Clone, FromRow, Serialize, Deserialize, Default)]
-pub struct Score {
-    pub score_id: String,
-
-    #[sqlx(flatten)]
-    pub hexaco: HexacoTraits,
-
-    #[sqlx(flatten)]
-    pub behavioral: BehavioralTraits,
-
-    #[serde(skip)]
-    pub embedding: Option<Vector>,
-}
+// Re-export all types at module root for convenience
+pub use activity::Activity;
+pub use channel::Channel;
+pub use enums::*;
+pub use message::Message;
+pub use platform::{ExternalContent, Platform, UserPlatformLink};
+pub use presence::{ForcedOnlineEvidence, Presence, PresenceActivity};
+pub use reaction::Reaction;
+pub use score::{BehavioralTraits, HexacoTraits, Score};
+pub use skill::{Skill, UserSkill, UserSkillEvidence};
+pub use user::{DiscordAccount, VestibuleUser};

@@ -1,35 +1,41 @@
+//! Skill tracking models.
+
 use pgvector::Vector;
 use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
 use uuid::Uuid;
 
-/// Skill definition
+/// Skill definition with optional embedding for similarity.
 #[derive(Debug, Clone, FromRow, Serialize, Deserialize)]
 pub struct Skill {
     pub id: Uuid,
     pub name: String,
+
     #[serde(skip)]
     pub embedding: Option<Vector>,
 }
 
-/// User's proficiency in a skill
+/// User's proficiency level in a skill.
 #[derive(Debug, Clone, FromRow, Serialize, Deserialize)]
 pub struct UserSkill {
     pub id: Uuid,
-    pub user_id: i64,
+    pub user_id: Uuid,
     pub skill_id: Uuid,
-    /// Skill level 0-10
+
+    /// Proficiency level (0-10).
     pub level: i16,
-    /// LLM reasoning context
+    /// LLM reasoning for the assessment.
     pub llm_context: Option<String>,
 }
 
-/// Evidence linking a message to a skill assessment
+/// Message evidence supporting a skill assessment.
 #[derive(Debug, Clone, FromRow, Serialize, Deserialize)]
 pub struct UserSkillEvidence {
     pub user_skill_id: Uuid,
     pub message_id: i64,
-    /// How strongly this message supports the skill assessment
+
+    /// Weight of this evidence (0.0-1.0).
     pub weight: f32,
+    /// LLM reasoning.
     pub reasoning: String,
 }

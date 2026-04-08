@@ -1,4 +1,4 @@
-.PHONY: clean rebuild
+.PHONY: clean rebuild schema
 
 schema: schema/*.sql
 	@echo "Generating schema.sql from schema/*.sql..."
