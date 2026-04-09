@@ -31,7 +31,7 @@ pub use connection::{ConnectedAccount, ExternalContent, Platform};
 pub use enums::*;
 pub use message::Message;
 pub use presence::{Presence, PresenceActivity};
-pub use reaction::{Emoji, Reaction};
+pub use reaction::Reaction;
 pub use score::{BehavioralTraits, HexacoTraits, Score};
 pub use skill::{Skill, UserSkill, UserSkillEvidence};
 pub use user::{DiscordAccount, VestibuleUser};
