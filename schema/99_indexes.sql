@@ -21,9 +21,6 @@ CREATE INDEX idx_presence_activities_current ON user_presence_activities(user_id
 -- User presence activities: historical queries
 CREATE INDEX idx_presence_activities_history ON user_presence_activities(user_id, started_at DESC);
 
--- Forced online evidence
-CREATE INDEX idx_forced_online_user ON forced_online_evidence(user_id, detected_at DESC);
-
 -- Messages: common queries
 CREATE INDEX idx_messages_sent_by ON messages(sent_by);
 CREATE INDEX idx_messages_channel_id ON messages(channel_id);
@@ -47,9 +44,9 @@ CREATE INDEX idx_messages_personality_pending ON messages(added_at)
 -- User skills
 CREATE INDEX idx_user_skills_user_id ON user_skills(user_id);
 
--- Platform associations and syncing
-CREATE INDEX idx_user_platform_association_user_id ON user_platform_association(vestibule_user_id);
-CREATE INDEX idx_user_platform_sync_due ON user_platform_association(next_sync_at)
+-- Connected accounts and syncing
+CREATE INDEX idx_connected_accounts_user_id ON connected_accounts(vestibule_user_id);
+CREATE INDEX idx_connected_accounts_sync_due ON connected_accounts(last_synced_at)
   WHERE sync_status = 'idle';
 
 -- User activities

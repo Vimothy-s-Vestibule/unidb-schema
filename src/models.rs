@@ -10,14 +10,14 @@
 //! - [`presence`] - Online status and activities
 //! - [`score`] - HEXACO and behavioral traits
 //! - [`skill`] - Skills and evidence
-//! - [`platform`] - External platform integrations
+//! - [`connection`] - Connected third-party accounts
 //! - [`activity`] - LLM-extracted activities
 
 pub mod activity;
 pub mod channel;
+pub mod connection;
 pub mod enums;
 pub mod message;
-pub mod platform;
 pub mod presence;
 pub mod reaction;
 pub mod score;
@@ -27,11 +27,11 @@ pub mod user;
 // Re-export all types at module root for convenience
 pub use activity::Activity;
 pub use channel::Channel;
+pub use connection::{ConnectedAccount, ExternalContent, Platform};
 pub use enums::*;
 pub use message::Message;
-pub use platform::{ExternalContent, Platform, UserPlatformLink};
-pub use presence::{ForcedOnlineEvidence, Presence, PresenceActivity};
-pub use reaction::Reaction;
+pub use presence::{Presence, PresenceActivity};
+pub use reaction::{Emoji, Reaction};
 pub use score::{BehavioralTraits, HexacoTraits, Score};
 pub use skill::{Skill, UserSkill, UserSkillEvidence};
 pub use user::{DiscordAccount, VestibuleUser};

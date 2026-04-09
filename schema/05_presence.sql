@@ -8,13 +8,8 @@ CREATE TABLE user_presence (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id bigint NOT NULL REFERENCES discord_accounts(discord_user_id) ON DELETE CASCADE,
 
-  -- Core status: online, idle, dnd, offline, invisible
+  -- Status: online, forced_online, onlinw, absent, do_not_disturb, offline
   status text NOT NULL,
-
-  -- Per-client breakdown (if available from Discord)
-  desktop_status text,
-  mobile_status text,
-  web_status text,
 
   -- Time range this status was active
   started_at timestamptz NOT NULL DEFAULT NOW(),
@@ -45,9 +40,7 @@ CREATE TABLE user_presence_activities (
   -- For streaming/music
   url text,                     -- Stream URL, Spotify link, etc.
 
-  -- Images if available
-  large_image_url text,
-  small_image_url text,
+  image_url text,
 
   -- Time range
   started_at timestamptz NOT NULL DEFAULT NOW(),
@@ -69,12 +62,9 @@ CREATE TABLE forced_online_evidence (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id bigint NOT NULL REFERENCES discord_accounts(discord_user_id) ON DELETE CASCADE,
   message_id bigint NOT NULL UNIQUE REFERENCES messages(message_id) ON DELETE CASCADE,
-
-  -- What status they were showing when they sent the message
-  displayed_status text NOT NULL,  -- offline, invisible
+  presence_id uuid NOT NULL REFERENCES user_presence(id),
 
   -- Link to the presence record at that time
-  presence_id uuid REFERENCES user_presence(id) ON DELETE SET NULL,
 
   detected_at timestamptz NOT NULL DEFAULT NOW()
 );

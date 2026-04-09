@@ -1,4 +1,4 @@
-//! External platform integration models.
+//! External platform connection models.
 
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
@@ -7,18 +7,18 @@ use uuid::Uuid;
 
 use super::enums::{PlatformAccess, PlatformSyncStatus};
 
-/// External social platform (GitHub, Strava, Spotify, etc.).
+/// An external platform that users can connect to (e.g., GitHub, Spotify, Strava).
 #[derive(Debug, Clone, FromRow, Serialize, Deserialize)]
 pub struct Platform {
     pub id: Uuid,
-    pub platform_name: String,
+    pub name: String,
     pub homepage: String,
     pub access_type: PlatformAccess,
 }
 
-/// Link between a user and their account on an external platform.
+/// A user's linked account on a specific platform.
 #[derive(Debug, Clone, FromRow, Serialize, Deserialize)]
-pub struct UserPlatformLink {
+pub struct ConnectedAccount {
     pub id: Uuid,
     pub vestibule_user_id: Uuid,
     pub platform_id: Uuid,
@@ -28,7 +28,7 @@ pub struct UserPlatformLink {
     pub profile_url: Option<String>,
 
     /// Message where this link was discovered.
-    pub platform_association_mention_message_id: Option<i64>,
+    pub mention_message_id: Option<i64>,
     /// Why we linked this account.
     pub reasoning: String,
 
@@ -38,11 +38,11 @@ pub struct UserPlatformLink {
     pub sync_status: Option<PlatformSyncStatus>,
 }
 
-/// Raw content fetched from an external platform.
+/// Raw content fetched from an external platform via a connected account.
 #[derive(Debug, Clone, FromRow, Serialize, Deserialize)]
 pub struct ExternalContent {
     pub id: Uuid,
-    pub platform_association_id: Uuid,
+    pub account_id: Uuid,
 
     /// Content type: github_repo, strava_activity, etc.
     pub content_type: String,
