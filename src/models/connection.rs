@@ -46,8 +46,6 @@ pub struct ExternalContent {
 
     /// Content type: github_repo, strava_activity, etc.
     pub content_type: String,
-    /// Platform's unique ID for this content.
-    pub external_id: String,
 
     /// Full API response.
     pub raw_data: serde_json::Value,

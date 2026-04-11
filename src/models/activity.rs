@@ -13,7 +13,7 @@ pub struct Activity {
 
     /// Type: run, cycle, git_commit, took_job, etc.
     pub activity_type: String,
-    /// Human-readable: "10km marathon", "Senior Engineer at Google".
+    /// Human-readable summary: "10km marathon", "Senior Engineer at Google".
     pub label: String,
 
     /// When the activity occurred (not extracted).

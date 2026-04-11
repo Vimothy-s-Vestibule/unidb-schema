@@ -16,7 +16,6 @@ pub struct HexacoTraits {
     pub openness_to_experience: f64,
 }
 
-/// Custom behavioral trait dimensions.
 #[derive(Debug, Clone, Default, FromRow, Serialize, Deserialize)]
 pub struct BehavioralTraits {
     pub agency: f64,
@@ -29,7 +28,6 @@ pub struct BehavioralTraits {
     pub busyness: f64,
 }
 
-/// Aggregated personality score with embedding.
 #[derive(Debug, Clone, FromRow, Serialize, Deserialize)]
 pub struct Score {
     pub id: Uuid,

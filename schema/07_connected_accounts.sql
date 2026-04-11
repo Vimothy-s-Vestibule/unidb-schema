@@ -37,7 +37,6 @@ CREATE TABLE external_content (
   account_id uuid NOT NULL REFERENCES connected_accounts(id) ON DELETE CASCADE,
 
   content_type text NOT NULL,              -- 'github_repo', 'strava_activity', 'spotify_track'
-  external_id text NOT NULL,               -- Platform's unique ID for this content
 
   raw_data jsonb NOT NULL,                 -- Full API response
   content_hash text,                       -- md5(raw_data) for change detection

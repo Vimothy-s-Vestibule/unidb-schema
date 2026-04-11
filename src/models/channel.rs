@@ -5,9 +5,8 @@ use sqlx::FromRow;
 
 use super::enums::DiscordChannelType;
 
-/// Discord channel (text, voice, forum, thread, etc.).
 #[derive(Debug, Clone, FromRow, Serialize, Deserialize)]
-pub struct Channel {
+pub struct DiscordChannel {
     pub channel_id: i64,
     pub name: String,
     pub channel_type: DiscordChannelType,

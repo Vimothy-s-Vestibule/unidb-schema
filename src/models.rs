@@ -26,7 +26,7 @@ pub mod user;
 
 // Re-export all types at module root for convenience
 pub use activity::Activity;
-pub use channel::Channel;
+pub use channel::DiscordChannel;
 pub use connection::{ConnectedAccount, ExternalContent, Platform};
 pub use enums::*;
 pub use message::Message;
