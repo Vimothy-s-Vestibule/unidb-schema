@@ -28,9 +28,10 @@ pub struct Message {
     // Per-message personality score
     pub score_id: Option<Uuid>,
 
-    // Processing pipeline
-    pub triage_status: Option<ProcessingStatus>,
-    pub is_significant: Option<bool>,
+    // Processing pipeline things
+    pub added_at: DateTime<Utc>,
+    pub triage_status: ProcessingStatus,
+    pub is_significant: bool,
     pub skill_status: Option<ProcessingStatus>,
     pub personality_status: Option<ProcessingStatus>,
     pub processed_at: Option<DateTime<Utc>>,
