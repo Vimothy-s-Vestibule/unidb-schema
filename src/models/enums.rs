@@ -96,19 +96,6 @@ pub enum PresenceStatus {
     Offline,
 }
 
-/// Discord rich presence activity type.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Type)]
-#[sqlx(type_name = "text", rename_all = "snake_case")]
-#[serde(rename_all = "snake_case")]
-pub enum ActivityType {
-    Playing,
-    Streaming,
-    Listening,
-    Watching,
-    Competing,
-    Custom,
-}
-
 /// How external platform data can be accessed.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Type)]
 #[sqlx(type_name = "text", rename_all = "snake_case")]

@@ -51,3 +51,26 @@ CREATE TABLE social_platforms (
   -- public: can fetch with username/public data only, oauth_required: needs user auth, unavailable: no API access, but still added because mentioned by user(s)
   access_type text NOT NULL
 );
+
+-- Seed initial data
+INSERT INTO social_platforms (id, platform_name, homepage, access_type)
+VALUES
+  (gen_random_uuid(), 'Strava', 'https://strava.com', 'oauth_required'),
+  (gen_random_uuid(), 'Spotify', 'https://spotify.com', 'oauth_required'),
+  (gen_random_uuid(), 'LinkedIn', 'https://linkedin.com', 'unavailable')
+ON CONFLICT (platform_name) DO NOTHING;
+
+
+-- For Things like profile pictures of discord accounts and Youtube commenter accounts/Youtube channel (inspired by seeing Reans' matching yt and discord pfps)
+CREATE TABLE media_assets (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+
+  -- HTML content-type
+  content_type text NOT NULL,
+
+  -- The actual content
+  bytes text NOT NULL,
+
+  -- For similarity with other media (TODO can we do across media types or only images <> images, etc.)
+  embedding vector
+);

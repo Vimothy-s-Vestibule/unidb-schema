@@ -19,7 +19,6 @@ CREATE TABLE user_activities (
   -- Sources (at least one required)
   external_content_id uuid REFERENCES external_content(id),
   message_id bigint REFERENCES messages(message_id),
-
   reasoning text,
 
   CHECK (external_content_id IS NOT NULL OR message_id IS NOT NULL)

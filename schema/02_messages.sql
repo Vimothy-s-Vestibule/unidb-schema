@@ -7,7 +7,7 @@ CREATE TABLE messages (
   message_id bigint PRIMARY KEY,
   channel_id bigint NOT NULL REFERENCES channels(channel_id),
 
-  sent_by bigint,
+  sent_by bigint NOT NULL,
 
   content text NOT NULL,
 
@@ -23,11 +23,11 @@ CREATE TABLE messages (
   score_id uuid REFERENCES scores(id),
 
   -- Processing pipeline metadata
-  triage_status text DEFAULT 'pending',    -- pending: Will be processed/processing: A worker is curretly processing this messaage and the status will change soon/complete: The message has been processed (terminal)/skipped: Message is insignificant (skipped, terminal)/failed: Will be retried when a cleanup job is run on the db
+  triage_status text NOT NULL DEFAULT 'pending',    -- pending: Will be processed/processing: A worker is curretly processing this messaage and the status will change soon/complete: The message has been processed (terminal)/skipped: Message is insignificant (skipped, terminal)/failed: Will be retried when a cleanup job is run on the db
  -- |
  -- |
  -- ⌄
-  is_significant boolean, -- Whether an LLM should score and extract personality from it, this field is also being set by an LLM TODO
+  is_significant boolean NOT NULL, -- Whether an LLM should score and extract personality from it, this field is also being set by an LLM TODO
  -- |
  -- |
  -- ⌄

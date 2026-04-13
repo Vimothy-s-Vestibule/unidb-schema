@@ -11,7 +11,7 @@ use super::enums::{PlatformAccess, PlatformSyncStatus};
 #[derive(Debug, Clone, FromRow, Serialize, Deserialize)]
 pub struct Platform {
     pub id: Uuid,
-    pub name: String,
+    pub platform_name: String,
     pub homepage: String,
     pub access_type: PlatformAccess,
 }
@@ -35,7 +35,7 @@ pub struct ConnectedAccount {
     // Sync state
     pub last_synced_at: Option<DateTime<Utc>>,
     pub last_sync_error: Option<String>,
-    pub sync_status: Option<PlatformSyncStatus>,
+    pub sync_status: PlatformSyncStatus,
 }
 
 /// Raw content fetched from an external platform via a connected account.
@@ -49,9 +49,10 @@ pub struct ExternalContent {
 
     /// Full API response.
     pub raw_data: serde_json::Value,
+
     /// Hash for change detection.
     pub content_hash: Option<String>,
 
-    pub fetched_at: Option<DateTime<Utc>>,
+    pub fetched_at: DateTime<Utc>,
     pub updated_at: Option<DateTime<Utc>>,
 }

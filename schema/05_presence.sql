@@ -29,7 +29,7 @@ CREATE TABLE user_presence_activities (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id bigint NOT NULL REFERENCES discord_accounts(discord_user_id) ON DELETE CASCADE,
 
-  -- Activity type: playing, streaming, listening, watching, competing, custom
+  -- Activity type
   activity_type text NOT NULL,
 
   -- Activity details
@@ -37,10 +37,7 @@ CREATE TABLE user_presence_activities (
   details text,                 -- Secondary line (e.g., "In Menu", "by Artist")
   state text,                   -- Third line (e.g., "Playing Solo", "In a party")
 
-  -- For streaming/music
   url text,                     -- Stream URL, Spotify link, etc.
-
-  image_url text,
 
   -- Time range
   started_at timestamptz NOT NULL DEFAULT NOW(),

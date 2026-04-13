@@ -22,7 +22,6 @@ pub struct Activity {
     // Source (at least one required)
     pub external_content_id: Option<Uuid>,
     pub message_id: Option<i64>,
-
-    /// LLM reasoning.
+    /// The LLM inferred the activity
     pub reasoning: Option<String>,
 }
