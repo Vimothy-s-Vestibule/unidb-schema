@@ -10,7 +10,7 @@ CREATE TABLE vestibule_users (
   real_last text,
   nickname text,
 
-  intro_message_id bigint,  -- FK added via ALTER TABLE after messages exists
+  intro_message_id bigint,  -- FK added via ALTER TABLE after messages exists, It can be null if we scrape the user from somewhere else, like if we want someone in the database who is not in the discord. 
 
   -- Aggregated personality scores from all messages
   score_id uuid REFERENCES scores(id),
@@ -23,11 +23,9 @@ CREATE TABLE vestibule_users (
   intro_diagram bytea
 );
 
--- ============================================================================
--- DISCORD ACCOUNTS TABLE
--- Many-to-one: multiple discord accounts can belong to one vestibule_user
--- ============================================================================
 
+-- Multiple discord accounts can belong to one vestibule_user
+-- TODO Save Discord connections such as LinkedIn, Spotify, Twitch, and others for big metadata gathering
 CREATE TABLE discord_accounts (
   discord_user_id bigint PRIMARY KEY,
   vestibule_user_id uuid NOT NULL REFERENCES vestibule_users(id) ON DELETE CASCADE,

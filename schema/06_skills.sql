@@ -25,12 +25,16 @@ CREATE TABLE user_skills (
 -- ============================================================================
 
 CREATE TABLE user_skill_evidence (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   user_skill_id uuid NOT NULL REFERENCES user_skills(id),
-  message_id bigint NOT NULL REFERENCES messages(message_id),
+  message_id bigint REFERENCES messages(message_id), -- evidence may also be a Strava activity, for example proving the user can run a certain pace
+  youtube_comment_id text REFERENCES youtube_comments(comment_id),
 
   -- How strongly this message supports the skill assessment
   weight real NOT NULL,
   reasoning text NOT NULL,
 
-  PRIMARY KEY (user_skill_id, message_id)
+  CHECK (message_id IS NOT NULL OR youtube_comment_id IS NOT NULL),
+  UNIQUE (user_skill_id, message_id),
+  UNIQUE (user_skill_id, youtube_comment_id)
 );

@@ -27,7 +27,7 @@ CREATE TABLE messages (
  -- |
  -- |
  -- ⌄
-  is_significant boolean NOT NULL, -- Whether an LLM should score and extract personality from it, this field is also being set by an LLM TODO
+  is_significant boolean NOT NULL, -- Whether an LLM should score and extract personality from it, TODO impl this field is also being set by an LLM
  -- |
  -- |
  -- ⌄

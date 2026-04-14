@@ -19,7 +19,8 @@ CREATE TABLE user_activities (
   -- Sources (at least one required)
   external_content_id uuid REFERENCES external_content(id),
   message_id bigint REFERENCES messages(message_id),
+  youtube_comment_id text REFERENCES youtube_comments(comment_id),
   reasoning text,
 
-  CHECK (external_content_id IS NOT NULL OR message_id IS NOT NULL)
+  CHECK (external_content_id IS NOT NULL OR message_id IS NOT NULL OR youtube_comment_id IS NOT NULL)
 );

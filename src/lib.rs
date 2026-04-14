@@ -1,5 +1,3 @@
-//! UniDB - Database models for a Discord bot application.
-
 pub mod models;
 pub mod scoring_schema;
 

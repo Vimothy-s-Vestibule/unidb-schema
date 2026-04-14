@@ -1,5 +1,3 @@
-//! User models: VestibuleUser and DiscordAccount.
-
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
@@ -11,7 +9,7 @@ pub struct VestibuleUser {
     /// unique (TODO UUIDv7?) user id
     pub id: Uuid,
 
-    // Real names extracted from messages (TODO not display name)
+    // Real names extracted from messages (TODO extract, not display name)
     pub real_first: Option<String>,
     pub real_last: Option<String>,
     pub nickname: Option<String>,
@@ -19,7 +17,7 @@ pub struct VestibuleUser {
     // Introduction message reference
     pub intro_message_id: Option<i64>,
 
-    // Aggregated personality score
+    /// Aggregated personality score from all messages the user sent
     pub score_id: Option<Uuid>,
     pub score_last_updated: Option<DateTime<Utc>>,
 

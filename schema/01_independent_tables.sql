@@ -57,7 +57,8 @@ INSERT INTO social_platforms (id, platform_name, homepage, access_type)
 VALUES
   (gen_random_uuid(), 'Strava', 'https://strava.com', 'oauth_required'),
   (gen_random_uuid(), 'Spotify', 'https://spotify.com', 'oauth_required'),
-  (gen_random_uuid(), 'LinkedIn', 'https://linkedin.com', 'unavailable')
+  (gen_random_uuid(), 'LinkedIn', 'https://linkedin.com', 'unavailable'),
+  (gen_random_uuid(), 'YouTube', 'https://youtube.com', 'public')
 ON CONFLICT (platform_name) DO NOTHING;
 
 

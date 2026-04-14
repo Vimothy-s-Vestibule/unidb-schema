@@ -1,16 +1,6 @@
-//! Database enum types.
-//!
-//! All PostgreSQL TEXT enums are defined here to avoid circular dependencies
-//! between model modules.
-
 use serde::{Deserialize, Serialize};
 use sqlx::Type;
 
-// =============================================================================
-// Channel Types
-// =============================================================================
-
-/// Discord channel type stored as TEXT in PostgreSQL.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Type, Default)]
 #[sqlx(type_name = "text", rename_all = "snake_case")]
 #[serde(rename_all = "snake_case")]
@@ -56,11 +46,9 @@ impl TryFrom<serenity::model::channel::ChannelType> for DiscordChannelType {
     }
 }
 
-// =============================================================================
-// Processing Pipeline
-// =============================================================================
+// ================================================================================
 
-/// Status for async processing pipelines (triage, skills, personality).
+/// Status for the async processing pipeline (general triage, skills, personality). TODO include significance here?
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Type, Default)]
 #[sqlx(type_name = "text", rename_all = "snake_case")]
 #[serde(rename_all = "snake_case")]
@@ -73,7 +61,7 @@ pub enum ProcessingStatus {
     Failed,
 }
 
-/// Status for external platform sync jobs.
+/// Status for external platform sync jobs
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Type, Default)]
 #[sqlx(type_name = "text", rename_all = "snake_case")]
 #[serde(rename_all = "snake_case")]
@@ -84,7 +72,7 @@ pub enum PlatformSyncStatus {
     Failed,
 }
 
-/// Discord online status.
+/// Discord online status
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Type)]
 #[sqlx(type_name = "text", rename_all = "snake_case")]
 #[serde(rename_all = "snake_case")]
@@ -101,10 +89,21 @@ pub enum PresenceStatus {
 #[sqlx(type_name = "text", rename_all = "snake_case")]
 #[serde(rename_all = "snake_case")]
 pub enum PlatformAccess {
-    /// Public API, no auth needed
+    /// Public API to get user data, no auth needed
     Public,
     /// Requires OAuth token
     OauthRequired,
-    /// No API available but user(s) still mentioned an account
+    /// No API available but user(s) still mentioned an account, TODO implement scraper workers
     Unavailable,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Type)]
+#[sqlx(type_name = "text", rename_all = "snake_case")]
+#[serde(rename_all = "snake_case")]
+pub enum YoutubeVideoBroadcastStatus {
+    Video,
+    CurrentLive,
+    PastLive,
+    ScheduledLive,
+    None,
 }

@@ -62,3 +62,15 @@ CREATE INDEX idx_user_activities_occurred ON user_activities(user_id, occurred_a
 -- CREATE INDEX idx_skills_embedding ON skills
 --   USING hnsw (embedding vector_cosine_ops)
 --   WHERE embedding IS NOT NULL;
+
+-- YouTube tables
+CREATE INDEX idx_youtube_comments_video ON youtube_comments(video_id);
+CREATE INDEX idx_youtube_comments_author ON youtube_comments(author_channel_id);
+CREATE INDEX idx_youtube_comments_published ON youtube_comments(published_at DESC);
+CREATE INDEX idx_youtube_videos_channel ON youtube_videos(channel_id);
+CREATE INDEX idx_youtube_comments_triage_pending ON youtube_comments(published_at DESC)
+  WHERE triage_status = 'pending';
+CREATE INDEX idx_youtube_comments_skill_pending ON youtube_comments(published_at DESC)
+  WHERE skill_status = 'pending';
+CREATE INDEX idx_youtube_comments_personality_pending ON youtube_comments(published_at DESC)
+  WHERE personality_status = 'pending';

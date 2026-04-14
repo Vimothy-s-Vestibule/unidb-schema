@@ -25,6 +25,7 @@ pub mod reaction;
 pub mod score;
 pub mod skill;
 pub mod user;
+pub mod youtube;
 
 // Re-export all types at module root for convenience
 pub use activity::Activity;
@@ -38,3 +39,4 @@ pub use reaction::Reaction;
 pub use score::{BehavioralTraits, HexacoTraits, Score};
 pub use skill::{Skill, UserSkill, UserSkillEvidence};
 pub use user::{DiscordAccount, VestibuleUser};
+pub use youtube::{YoutubeChannel, YoutubeComment, YoutubeVideo};
