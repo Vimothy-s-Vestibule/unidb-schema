@@ -3,7 +3,6 @@
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
-use uuid::Uuid;
 
 use super::enums::ProcessingStatus;
 
@@ -21,9 +20,6 @@ pub struct Message {
 
     // Threads & normal replies
     pub in_reply_to: Option<i64>,
-
-    // Per-message personality score
-    pub score_id: Option<Uuid>,
 
     // Processing pipeline metadata
     pub added_at: DateTime<Utc>,

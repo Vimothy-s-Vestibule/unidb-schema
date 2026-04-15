@@ -43,25 +43,6 @@ CREATE TABLE skills (
   embedding vector
 );
 
-CREATE TABLE social_platforms (
-  id uuid PRIMARY KEY,
-  platform_name text NOT NULL UNIQUE,
-  -- URL: https://strava.com https://spotify.com https://linkedin.com ...
-  homepage text NOT NULL,
-  -- public: can fetch with username/public data only, oauth_required: needs user auth, unavailable: no API access, but still added because mentioned by user(s)
-  access_type text NOT NULL
-);
-
--- Seed initial data
-INSERT INTO social_platforms (id, platform_name, homepage, access_type)
-VALUES
-  (gen_random_uuid(), 'Strava', 'https://strava.com', 'oauth_required'),
-  (gen_random_uuid(), 'Spotify', 'https://spotify.com', 'oauth_required'),
-  (gen_random_uuid(), 'LinkedIn', 'https://linkedin.com', 'unavailable'),
-  (gen_random_uuid(), 'YouTube', 'https://youtube.com', 'public')
-ON CONFLICT (platform_name) DO NOTHING;
-
-
 -- For Things like profile pictures of discord accounts and Youtube commenter accounts/Youtube channel (inspired by seeing Reans' matching yt and discord pfps)
 CREATE TABLE media_assets (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),

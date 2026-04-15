@@ -16,6 +16,7 @@ pub struct YoutubeChannel {
     pub bio: Option<String>,
     pub profile_picture_asset_id: Option<Uuid>,
     pub name_embedding: Option<Vector>,
+    pub score_id: Option<Uuid>,
 }
 
 #[derive(Debug, Clone, FromRow, Serialize, Deserialize)]
@@ -52,8 +53,6 @@ pub struct YoutubeComment {
     pub updated_at: Option<DateTime<Utc>>,
 
     pub in_reply_to: Option<String>,
-
-    pub score_id: Option<Uuid>,
 
     pub triage_status: ProcessingStatus,
     pub is_significant: bool,

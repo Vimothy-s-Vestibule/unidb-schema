@@ -19,9 +19,6 @@ CREATE TABLE messages (
   -- Self-reference for reply chains
   in_reply_to bigint REFERENCES messages(message_id),
 
-  -- LLM personality score for only this message
-  score_id uuid REFERENCES scores(id),
-
   -- Processing pipeline metadata
   triage_status text NOT NULL DEFAULT 'pending',    -- pending: Will be processed/processing: A worker is curretly processing this messaage and the status will change soon/complete: The message has been processed (terminal)/skipped: Message is insignificant (skipped, terminal)/failed: Will be retried when a cleanup job is run on the db
  -- |
