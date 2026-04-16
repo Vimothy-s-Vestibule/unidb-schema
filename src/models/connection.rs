@@ -1,6 +1,7 @@
 //! External platform connection models.
 
 use chrono::{DateTime, Utc};
+use pgvector::Vector;
 use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
 use uuid::Uuid;
@@ -14,6 +15,7 @@ pub struct Platform {
     pub platform_name: String,
     pub homepage: String,
     pub access_type: PlatformAccess,
+    pub logo: String,
 }
 
 /// A user's linked account on a specific platform.
@@ -23,9 +25,14 @@ pub struct ConnectedAccount {
     pub vestibule_user_id: Uuid,
     pub platform_id: Uuid,
 
-    pub platform_username: String,
+    pub platform_user_id: Option<String>,
     pub platform_display_name: String,
-    pub profile_url: Option<String>,
+    pub platform_username: String,
+
+    pub bio: Option<String>,
+    pub bio_additional_info: Option<String>,
+    pub profile_picture: String,
+    pub name_embedding: Option<Vector>,
 
     /// Message where this link was discovered.
     pub mention_message_id: Option<i64>,

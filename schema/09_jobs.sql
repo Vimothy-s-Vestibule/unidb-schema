@@ -24,7 +24,6 @@ CREATE TABLE jobs (
 
   -- Check constraint to ensure exactly one target table is specified
   CONSTRAINT has_single_target CHECK (
-    (youtube_channel_id IS NOT NULL)::int + 
     (youtube_video_id IS NOT NULL)::int + 
     (discord_channel_id IS NOT NULL)::int + 
     (connected_account_id IS NOT NULL)::int +

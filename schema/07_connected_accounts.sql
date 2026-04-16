@@ -5,7 +5,7 @@ CREATE TABLE social_platforms (
   homepage text NOT NULL,
   -- public: can fetch with username/public data only, oauth_required: needs user auth, unavailable: no API access, but still added because mentioned by user(s)
   access_type text NOT NULL,
-  logo text NOT NULL REFERENCES media_assets(id),
+  logo text NOT NULL REFERENCES media_assets(id)
 );
 
 -- Seed initial data
@@ -17,7 +17,7 @@ VALUES
   -- 
   (gen_random_uuid(), 'YouTube', 'https://youtube.com', 'public'),
   -- TODO curl -L -X GET "https://api.github.com/users/alex" -H "Accept: application/vnd.github+json"
-  (gen_random_uuid(), 'GitHub', 'https://github.com', 'public')
+  (gen_random_uuid(), 'GitHub', 'https://github.com', 'public'),
   -- TODO Use Nvidia parakeet to transscribe Sylvan's daily internal monolouge and run analysis on it for maximum data extraction: https://vimothee.substack.com/feed
   (gen_random_uuid(), 'Substack', 'https://substack.com', 'public')
 ON CONFLICT (platform_name) DO NOTHING;
@@ -34,7 +34,7 @@ CREATE TABLE connected_accounts (
 
   -- For YT: The Channel ID
   -- Might be NULL for platforms like GitHub
-  platform_user_id: text,
+  platform_user_id text,
 
   -- For YT: Sylvan Franklin
   platform_display_name text NOT NULL,

@@ -25,7 +25,7 @@ CREATE TABLE youtube_videos (
   audio_asset_id uuid REFERENCES media_assets(id),
   keyword_tags text[],
 
-  added_at timestamptz DEFAULT NOW
+  added_at timestamptz DEFAULT NOW()
 );
 
 CREATE TABLE youtube_comments (

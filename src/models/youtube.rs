@@ -1,23 +1,9 @@
 use chrono::{DateTime, Utc};
-use pgvector::Vector;
 use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
 use uuid::Uuid;
 
 use super::enums::{ProcessingStatus, YoutubeVideoBroadcastStatus};
-
-#[derive(Debug, Clone, FromRow, Serialize, Deserialize)]
-pub struct YoutubeChannel {
-    pub channel_id: String,
-    pub display_name: String,
-    pub username: String,
-    pub bio_location: Option<String>,
-    pub vestibule_user_id: Option<String>,
-    pub bio: Option<String>,
-    pub profile_picture_asset_id: Option<Uuid>,
-    pub name_embedding: Option<Vector>,
-    pub score_id: Option<Uuid>,
-}
 
 #[derive(Debug, Clone, FromRow, Serialize, Deserialize)]
 pub struct YoutubeVideo {
@@ -34,6 +20,8 @@ pub struct YoutubeVideo {
     pub broadcast_status: YoutubeVideoBroadcastStatus,
 
     pub thumbnail_asset_id: Option<Uuid>,
+    pub transcript_asset_id: Option<Uuid>,
+    pub audio_asset_id: Option<Uuid>,
     pub keyword_tags: Option<Vec<String>>,
 
     pub added_at: Option<DateTime<Utc>>,
