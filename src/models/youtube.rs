@@ -8,7 +8,7 @@ use super::enums::{ProcessingStatus, YoutubeVideoBroadcastStatus};
 #[derive(Debug, Clone, FromRow, Serialize, Deserialize)]
 pub struct YoutubeVideo {
     pub video_id: String,
-    pub channel_id: String,
+    pub channel_id: Uuid,
     pub title: String,
     pub description: Option<String>,
     pub published_at: DateTime<Utc>,
@@ -33,7 +33,7 @@ pub struct YoutubeComment {
     pub video_id: String,
 
     pub author_raw_channel_id: String,
-    pub author_channel_id: Option<String>,
+    pub author_channel_id: Option<Uuid>,
 
     pub content: String,
     pub like_count: i32,

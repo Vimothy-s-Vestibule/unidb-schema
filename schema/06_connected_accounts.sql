@@ -5,7 +5,7 @@ CREATE TABLE social_platforms (
   homepage text NOT NULL,
   -- public: can fetch with username/public data only, oauth_required: needs user auth, unavailable: no API access, but still added because mentioned by user(s)
   access_type text NOT NULL,
-  logo text NOT NULL REFERENCES media_assets(id)
+  logo uuid REFERENCES media_assets(id)
 );
 
 -- Seed initial data
@@ -46,7 +46,7 @@ CREATE TABLE connected_accounts (
   -- On Youtube, for example, some people fill in where they are located in the world or some toher stuff
   bio_additional_info text,
   
-  profile_picture text NOT NULL REFERENCES media_assets(id),
+  profile_picture uuid REFERENCES media_assets(id),
 
 
   -- For finding similar users in Discord accounts and across other platforms, TODO choose universal vector dimensions amount and choose embedding model (preferably selfhostable)

@@ -6,7 +6,7 @@ CREATE TABLE youtube_videos (
   -- The part after youtube.com/watch?v=
   video_id text PRIMARY KEY,
 
-  channel_id text NOT NULL REFERENCES connected_accounts(id) ON DELETE CASCADE,
+  channel_id uuid NOT NULL REFERENCES connected_accounts(id) ON DELETE CASCADE,
   title text NOT NULL,
   description text,
   published_at timestamptz NOT NULL,
@@ -35,7 +35,7 @@ CREATE TABLE youtube_comments (
   -- The channel that posted the comment
   author_raw_channel_id text NOT NULL,
   -- If the channel is already in the db, populate this field too, TODO When and how do we decide If we want to add a user to the db, I'd say after the second comment they wrute or if they are deemed significant and can be linked to a vestibule user by an admin.
-  author_channel_id text REFERENCES connected_accounts(id) ON DELETE CASCADE,
+  author_channel_id uuid REFERENCES connected_accounts(id) ON DELETE CASCADE,
 
   content text NOT NULL,
   

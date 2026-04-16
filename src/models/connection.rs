@@ -15,7 +15,7 @@ pub struct Platform {
     pub platform_name: String,
     pub homepage: String,
     pub access_type: PlatformAccess,
-    pub logo: String,
+    pub logo: Option<Uuid>,
 }
 
 /// A user's linked account on a specific platform.
@@ -31,7 +31,7 @@ pub struct ConnectedAccount {
 
     pub bio: Option<String>,
     pub bio_additional_info: Option<String>,
-    pub profile_picture: String,
+    pub profile_picture: Option<Uuid>,
     pub name_embedding: Option<Vector>,
 
     /// Message where this link was discovered.
