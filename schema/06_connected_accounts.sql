@@ -18,7 +18,7 @@ VALUES
   (gen_random_uuid(), 'YouTube', 'https://youtube.com', 'public'),
   -- TODO curl -L -X GET "https://api.github.com/users/alex" -H "Accept: application/vnd.github+json"
   (gen_random_uuid(), 'GitHub', 'https://github.com', 'public'),
-  -- TODO Use Nvidia parakeet to transscribe Sylvan's daily internal monolouge and run analysis on it for maximum data extraction: https://vimothee.substack.com/feed
+  -- TODO Use Nvidia parakeet to transscribe Sylvan's daily internal monologue and run analysis on it for maximum data extraction: https://vimothee.substack.com/feed
   (gen_random_uuid(), 'Substack', 'https://substack.com', 'public')
 ON CONFLICT (platform_name) DO NOTHING;
 

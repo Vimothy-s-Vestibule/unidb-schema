@@ -2,7 +2,7 @@
 -- USER ACTIVITIES TABLE
 -- LLM-extracted activities from messages and external content (immutable)
 -- Depends on: vestibule_users, external_content, messages
--- TODO make it so admins can manually add activites
+-- TODO make it so admins can manually add activities
 -- ============================================================================
 CREATE TABLE user_activities (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),

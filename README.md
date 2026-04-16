@@ -6,7 +6,7 @@ For simplicity, threads in a text channel with threads enabled (e.g. `#introduct
 
 ## About `Array<Nullable<Text>>` and `Vec<Option<String>>`
 
-This is serialized like this because postgres cannot guarantee that any element in the array is not NULL or None in rust terms. I have written a helper `TextVec`, that guarantees that all values in it are some. Please use this newtype in the rust data model structs when contributing to the schema. It can be coverted to a `Vec<String>` by doing `.deref()` or `*my_text_vector` or `my_string_vector: Vec<String> = my_text_vector.into()`.
+This is serialized like this because postgres cannot guarantee that any element in the array is not NULL or None in rust terms. I have written a helper `TextVec`, that guarantees that all values in it are some. Please use this newtype in the rust data model structs when contributing to the schema. It can be converted to a `Vec<String>` by doing `.deref()` or `*my_text_vector` or `my_string_vector: Vec<String> = my_text_vector.into()`.
 
 ## Using the schema and data models in Rust
 
