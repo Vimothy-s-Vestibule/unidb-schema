@@ -10,7 +10,8 @@ CREATE TABLE vestibule_users (
   real_last text,
   nickname text,
 
-  intro_message_id bigint,  -- FK added via ALTER TABLE after messages exists, It can be null if we scrape the user from somewhere else, like if we want someone in the database who is not in the discord. 
+  -- FK added via ALTER TABLE after messages exists, It can be null if we add users from outside of the discord and because writing an intro is not mandatory anymore
+  intro_message_id bigint,  
 
   -- Aggregated personality scores from all messages
   score_id uuid REFERENCES scores(id),
@@ -33,7 +34,12 @@ CREATE TABLE discord_accounts (
   display_name text NOT NULL
 );
 
--- Add FK from messages to discord_accounts (deferred due to dependency order)
+-- FK from messages to discord_accounts (deferred due to dependency order)
 ALTER TABLE messages 
   ADD CONSTRAINT fk_messages_sent_by 
   FOREIGN KEY (sent_by) REFERENCES discord_accounts(discord_user_id);
+
+-- FK from vestibule_users to messages (deferred due to dependency order)
+ALTER TABLE vestibule_users
+  ADD CONSTRAINT fk_vestibule_users_intro_message
+  FOREIGN KEY (intro_message_id) REFERENCES messages(message_id);
