@@ -1,7 +1,3 @@
--- ============================================================================
--- INDEXES
--- ============================================================================
-
 -- Discord accounts
 CREATE INDEX idx_discord_accounts_user ON discord_accounts(vestibule_user_id);
 
@@ -33,14 +29,6 @@ CREATE INDEX idx_messages_in_reply_to ON messages(in_reply_to) WHERE in_reply_to
 CREATE INDEX idx_messages_active ON messages(channel_id, sent_at DESC)
   WHERE deleted_at IS NULL;
 
--- Message processing pipeline
-CREATE INDEX idx_messages_triage_pending ON messages(added_at)
-  WHERE triage_status = 'pending';
-CREATE INDEX idx_messages_skill_pending ON messages(added_at)
-  WHERE skill_status = 'pending';
-CREATE INDEX idx_messages_personality_pending ON messages(added_at)
-  WHERE personality_status = 'pending';
-
 -- User skills
 CREATE INDEX idx_user_skills_user_id ON user_skills(user_id);
 
@@ -68,9 +56,3 @@ CREATE INDEX idx_youtube_comments_video ON youtube_comments(video_id);
 CREATE INDEX idx_youtube_comments_author ON youtube_comments(author_channel_id);
 CREATE INDEX idx_youtube_comments_published ON youtube_comments(published_at DESC);
 CREATE INDEX idx_youtube_videos_channel ON youtube_videos(channel_id);
-CREATE INDEX idx_youtube_comments_triage_pending ON youtube_comments(published_at DESC)
-  WHERE triage_status = 'pending';
-CREATE INDEX idx_youtube_comments_skill_pending ON youtube_comments(published_at DESC)
-  WHERE skill_status = 'pending';
-CREATE INDEX idx_youtube_comments_personality_pending ON youtube_comments(published_at DESC)
-  WHERE personality_status = 'pending';

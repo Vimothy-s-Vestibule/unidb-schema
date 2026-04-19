@@ -46,21 +46,6 @@ impl TryFrom<serenity::model::channel::ChannelType> for DiscordChannelType {
     }
 }
 
-// ================================================================================
-
-/// Status for the async processing pipeline (general triage, skills, personality). TODO include significance here?
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Type, Default)]
-#[sqlx(type_name = "text", rename_all = "snake_case")]
-#[serde(rename_all = "snake_case")]
-pub enum ProcessingStatus {
-    #[default]
-    Pending,
-    Processing,
-    Complete,
-    Skipped,
-    Failed,
-}
-
 /// Status for external platform sync jobs
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Type, Default)]
 #[sqlx(type_name = "text", rename_all = "snake_case")]
@@ -95,6 +80,18 @@ pub enum PlatformAccess {
     OauthRequired,
     /// No API available but user(s) still mentioned an account, TODO implement scraper workers
     Unavailable,
+}
+
+/// Status for the async processing pipeline (general triage, skills, personality). TODO include significance here?
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Type, Default)]
+#[sqlx(type_name = "text", rename_all = "snake_case")]
+#[serde(rename_all = "snake_case")]
+pub enum JobStatus {
+    #[default]
+    Pending,
+    InProgress,
+    Completed,
+    Failed,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Type)]

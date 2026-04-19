@@ -1,7 +1,5 @@
--- ============================================================================
 -- USER SKILLS TABLE
 -- Depends on: vestibule_users, skills
--- ============================================================================
 
 CREATE TABLE user_skills (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -19,11 +17,8 @@ CREATE TABLE user_skills (
   UNIQUE (user_id, skill_id)
 );
 
--- ============================================================================
--- USER SKILL EVIDENCE TABLE
--- Depends on: user_skills, messages
--- ============================================================================
 
+-- Depends on: user_skills, messages
 CREATE TABLE user_skill_evidence (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   user_skill_id uuid NOT NULL REFERENCES user_skills(id),

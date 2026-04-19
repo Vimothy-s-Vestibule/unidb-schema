@@ -18,7 +18,7 @@ CREATE TABLE jobs (
   -- POLYMORPHIC FOREIGN KEYS 
   -- (Only ONE of these should be NOT NULL for a given row)
   youtube_video_id text REFERENCES youtube_videos(video_id) ON DELETE CASCADE,
-  discord_channel_id bigint REFERENCES channels(channel_id) ON DELETE CASCADE,
+  discord_channel_id bigint REFERENCES discord_channels(channel_id) ON DELETE CASCADE,
   connected_account_id uuid REFERENCES connected_accounts(id) ON DELETE CASCADE,
   media_asset_id uuid REFERENCES media_assets(id) ON DELETE CASCADE,
 

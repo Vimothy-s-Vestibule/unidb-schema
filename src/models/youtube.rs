@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
 use uuid::Uuid;
 
-use super::enums::{ProcessingStatus, YoutubeVideoBroadcastStatus};
+use super::enums::YoutubeVideoBroadcastStatus;
 
 #[derive(Debug, Clone, FromRow, Serialize, Deserialize)]
 pub struct YoutubeVideo {
@@ -38,13 +38,8 @@ pub struct YoutubeComment {
     pub content: String,
     pub like_count: i32,
     pub published_at: DateTime<Utc>,
-    pub updated_at: Option<DateTime<Utc>>,
+    pub edited_at: Option<DateTime<Utc>>,
 
     pub in_reply_to: Option<String>,
-
-    pub triage_status: ProcessingStatus,
-    pub is_significant: bool,
-    pub skill_status: Option<ProcessingStatus>,
-    pub personality_status: Option<ProcessingStatus>,
-    pub processed_at: Option<DateTime<Utc>>,
+    pub added_at: Option<DateTime<Utc>>,
 }

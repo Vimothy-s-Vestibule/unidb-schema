@@ -37,7 +37,7 @@ pub use job::Job;
 pub use media_asset::MediaAsset;
 pub use message::Message;
 pub use presence::{ForcedOnlineEvidence, Presence, PresenceActivity};
-pub use reaction::Reaction;
+pub use reaction::{DiscordEmoji, MessageReaction};
 pub use score::{BehavioralTraits, HexacoTraits, Score};
 pub use skill::{Skill, UserSkill, UserSkillEvidence};
 pub use user::{DiscordAccount, VestibuleUser};

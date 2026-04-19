@@ -1,11 +1,7 @@
--- ============================================================================
--- MESSAGES TABLE
 -- Depends on: channels, scores
--- ============================================================================
-
 CREATE TABLE messages (
   message_id bigint PRIMARY KEY,
-  channel_id bigint NOT NULL REFERENCES channels(channel_id),
+  channel_id bigint NOT NULL REFERENCES discord_channels(channel_id),
 
   sent_by bigint NOT NULL,
 
@@ -16,20 +12,5 @@ CREATE TABLE messages (
   last_edited timestamptz,
   deleted_at timestamptz,
 
-  -- Self-reference for reply chains
-  in_reply_to bigint REFERENCES messages(message_id),
-
-  -- Processing pipeline metadata
-  -- TODO make it so admins can manually override messages to be included/excluded from skills or personality processing
-  triage_status text NOT NULL DEFAULT 'pending',    -- pending: Will be processed/processing: A worker is currently processing this messaage and the status will change soon/complete: The message has been processed (terminal)/skipped: Message is insignificant (skipped, terminal)/failed: Will be retried when a cleanup job is run on the db
- -- |
- -- |
- -- ⌄
-  is_significant boolean NOT NULL, -- Whether an LLM should score and extract personality from it, TODO impl this field is also being set by an LLM
- -- |
- -- |
- -- ⌄
-  skill_status text, -- NULL: insignificant for skills/pending: Will be processed/processing: A worker is currently processing this messaage and the status will change soon/complete: The message has been processed (terminal)/skipped: Message is insignificant (skipped, terminal)/failed: Will be retried when a cleanup job is run on the db
-  personality_status text, -- NULL: insignificant for persinality extraction/pending: Will be processed/processing: A worker is currently processing this messaage and the status will change soon/complete: The message has been processed (terminal)/skipped: Message is insignificant (skipped, terminal)/failed: Will be retried when a cleanup job is run on the db
-  processed_at timestamptz
+  in_reply_to bigint REFERENCES messages(message_id)
 );

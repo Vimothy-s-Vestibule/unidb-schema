@@ -1,7 +1,3 @@
--- Youtube related tables
--- Depends on: scores, vestibule_users
-
-
 CREATE TABLE youtube_videos (
   -- The part after youtube.com/watch?v=
   video_id text PRIMARY KEY,
@@ -42,14 +38,10 @@ CREATE TABLE youtube_comments (
   like_count integer NOT NULL,
   
   published_at timestamptz NOT NULL,
-  updated_at timestamptz,
+  edited_at timestamptz,
   
   -- Self-reference for replies
   in_reply_to text REFERENCES youtube_comments(comment_id),
-  
-  triage_status text NOT NULL DEFAULT 'pending',
-  is_significant boolean NOT NULL,
-  skill_status text,
-  personality_status text,
-  processed_at timestamptz
+
+  added_at timestamptz
 );

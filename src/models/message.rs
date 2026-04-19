@@ -4,8 +4,6 @@ use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
 
-use super::enums::ProcessingStatus;
-
 /// Discord message with processing pipeline metadata.
 #[derive(Debug, Clone, FromRow, Serialize, Deserialize)]
 pub struct Message {
@@ -21,11 +19,5 @@ pub struct Message {
     // Threads & normal replies
     pub in_reply_to: Option<i64>,
 
-    // Processing pipeline metadata
     pub added_at: DateTime<Utc>,
-    pub is_significant: bool,
-    pub triage_status: ProcessingStatus,
-    pub skill_status: Option<ProcessingStatus>,
-    pub personality_status: Option<ProcessingStatus>,
-    pub processed_at: Option<DateTime<Utc>>,
 }

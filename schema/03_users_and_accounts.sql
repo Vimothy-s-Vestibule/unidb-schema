@@ -1,8 +1,5 @@
--- ============================================================================
--- VESTIBULE USERS TABLE (canonical user entity)
--- A user can have 0 or many Discord accounts
--- ============================================================================
-
+-- Canonical user entity
+-- A user can have 0 to many Discord accounts
 CREATE TABLE vestibule_users (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
 

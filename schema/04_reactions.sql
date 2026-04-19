@@ -1,22 +1,4 @@
--- ============================================================================
--- MESSAGE REACTIONS TABLE
--- Tracks emoji reactions on Discord messages
 -- Depends on: messages, discord_accounts
--- ============================================================================
-
-CREATE TABLE message_reactions (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  message_id bigint NOT NULL REFERENCES messages(message_id) ON DELETE CASCADE,
-  user_id bigint NOT NULL REFERENCES discord_accounts(discord_user_id) ON DELETE CASCADE,
-
-  emoji_id REFERENCES emojis(id) ON DELETE RESTRICT,
-
-  reacted_at timestamptz NOT NULL DEFAULT NOW(),
-
-  -- Prevent duplicate reactions
-  UNIQUE (message_id, user_id, emoji)
-);
-
 CREATE TABLE discord_emojis (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
 
@@ -36,5 +18,18 @@ CREATE TABLE discord_emojis (
   -- Format: TODO
   emoji_url text,
 
-  asset_id REFERENCES media_assets(id)
+  asset_id uuid REFERENCES media_assets(id)
+);
+
+CREATE TABLE message_reactions (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  message_id bigint NOT NULL REFERENCES messages(message_id) ON DELETE CASCADE,
+  user_id bigint NOT NULL REFERENCES discord_accounts(discord_user_id) ON DELETE CASCADE,
+
+  emoji_id uuid REFERENCES discord_emojis(id) ON DELETE RESTRICT,
+
+  reacted_at timestamptz NOT NULL DEFAULT NOW(),
+
+  -- Prevent duplicate reactions
+  UNIQUE (message_id, user_id, emoji_id)
 );

@@ -1,9 +1,6 @@
--- ============================================================================
--- USER ACTIVITIES TABLE
--- LLM-extracted activities from messages and external content (immutable)
+-- LLM-extracted activities from messages and external content
 -- Depends on: vestibule_users, external_content, messages
 -- TODO make it so admins can manually add activities
--- ============================================================================
 CREATE TABLE user_activities (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id uuid NOT NULL REFERENCES vestibule_users(id) ON DELETE CASCADE,
