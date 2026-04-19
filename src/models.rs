@@ -7,11 +7,11 @@
 //! - [`channel`] - Discord channels
 //! - [`message`] - Discord messages
 //! - [`reaction`] - Message reactions
-//! - [`presence`] - Online status and activities
+//! - [`presence`] - Online status tracking
 //! - [`score`] - HEXACO and behavioral traits
 //! - [`skill`] - Skills and evidence
 //! - [`connection`] - Connected third-party accounts
-//! - [`activity`] - LLM-extracted activities
+//! - [`activity`] - Unified activities (LLM-extracted + Discord presence)
 //! - [`media_asset`] - Media assets (profile pictures, etc)
 
 pub mod activity;
@@ -36,7 +36,7 @@ pub use enums::*;
 pub use job::Job;
 pub use media_asset::MediaAsset;
 pub use message::Message;
-pub use presence::{ForcedOnlineEvidence, Presence, PresenceActivity};
+pub use presence::{ForcedOnlineEvidence, Presence};
 pub use reaction::{DiscordEmoji, MessageReaction};
 pub use score::{BehavioralTraits, HexacoTraits, Score};
 pub use skill::{Skill, UserSkill, UserSkillEvidence};

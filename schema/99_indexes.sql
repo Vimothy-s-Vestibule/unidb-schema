@@ -12,11 +12,6 @@ CREATE INDEX idx_presence_history ON user_presence(user_id, started_at, ended_at
 -- User presence: time-based queries
 CREATE INDEX idx_presence_time ON user_presence(started_at DESC);
 
--- User presence activities: current activities per user
-CREATE INDEX idx_presence_activities_current ON user_presence_activities(user_id) WHERE ended_at IS NULL;
--- User presence activities: historical queries
-CREATE INDEX idx_presence_activities_history ON user_presence_activities(user_id, started_at DESC);
-
 -- Messages: common queries
 CREATE INDEX idx_messages_sent_by ON messages(sent_by);
 CREATE INDEX idx_messages_channel_id ON messages(channel_id);
@@ -32,15 +27,17 @@ CREATE INDEX idx_messages_active ON messages(channel_id, sent_at DESC)
 -- User skills
 CREATE INDEX idx_user_skills_user_id ON user_skills(user_id);
 
--- Connected accounts and syncing
+-- Connected accounts
 CREATE INDEX idx_connected_accounts_user_id ON connected_accounts(vestibule_user_id);
-CREATE INDEX idx_connected_accounts_sync_due ON connected_accounts(last_synced_at)
-  WHERE sync_status = 'idle';
 
 -- User activities
-CREATE INDEX idx_user_activities_user ON user_activities(user_id);
-CREATE INDEX idx_user_activities_type ON user_activities(user_id, activity_type);
-CREATE INDEX idx_user_activities_occurred ON user_activities(user_id, occurred_at DESC);
+CREATE INDEX idx_user_activities_user ON user_activities(user_id) WHERE user_id IS NOT NULL;
+CREATE INDEX idx_user_activities_discord_user ON user_activities(discord_user_id) WHERE discord_user_id IS NOT NULL;
+CREATE INDEX idx_user_activities_type ON user_activities(activity_type);
+CREATE INDEX idx_user_activities_source ON user_activities(source);
+CREATE INDEX idx_user_activities_occurred ON user_activities(started_at DESC) WHERE started_at IS NOT NULL;
+-- Current ongoing activities (discord presence)
+CREATE INDEX idx_user_activities_current ON user_activities(discord_user_id) WHERE ended_at IS NULL AND source = 'discord_presence';
 
 -- Vector similarity search (HNSW index)
 -- CREATE INDEX idx_scores_embedding ON scores

@@ -46,15 +46,19 @@ impl TryFrom<serenity::model::channel::ChannelType> for DiscordChannelType {
     }
 }
 
-/// Status for external platform sync jobs
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Type, Default)]
+/// Where a user activity originated from
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Type)]
 #[sqlx(type_name = "text", rename_all = "snake_case")]
 #[serde(rename_all = "snake_case")]
-pub enum PlatformSyncStatus {
-    #[default]
-    Idle,
-    Running,
-    Failed,
+pub enum ActivitySource {
+    /// Discord rich presence
+    DiscordPresence,
+    /// LLM-extracted from a message, external content, etc.
+    LlmExtraction,
+    /// Obtained from a connected_accounts account
+    ExternalContent,
+    /// Manually added by an admin
+    Manual,
 }
 
 /// Discord online status

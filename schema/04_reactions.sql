@@ -24,7 +24,7 @@ CREATE TABLE discord_emojis (
 CREATE TABLE message_reactions (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   message_id bigint NOT NULL REFERENCES messages(message_id) ON DELETE CASCADE,
-  user_id bigint NOT NULL REFERENCES discord_accounts(discord_user_id) ON DELETE CASCADE,
+  user_id bigint NOT NULL REFERENCES discord_accounts(discord_user_id),
 
   emoji_id uuid REFERENCES discord_emojis(id) ON DELETE RESTRICT,
 

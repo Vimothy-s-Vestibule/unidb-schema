@@ -1,5 +1,3 @@
-//! User presence and activity tracking models.
-
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
@@ -20,33 +18,6 @@ pub struct Presence {
     pub started_at: DateTime<Utc>,
     /// NULL = current status.
     pub ended_at: Option<DateTime<Utc>>,
-}
-
-/// Rich presence activity (games, Spotify, streaming).
-#[derive(Debug, Clone, FromRow, Serialize, Deserialize)]
-pub struct PresenceActivity {
-    pub id: Uuid,
-    pub user_id: i64,
-
-    pub activity_type: String,
-
-    /// Game name, song title, etc.
-    pub name: String,
-    /// Secondary line (e.g., "In Menu").
-    pub details: Option<String>,
-    /// Third line (e.g., "Playing Solo").
-    pub state: Option<String>,
-
-    /// Stream or Spotify URL
-    pub url: Option<String>,
-
-    /// Time range.
-    pub started_at: DateTime<Utc>,
-    /// None (NULL) = still ongoing
-    pub ended_at: Option<DateTime<Utc>>,
-
-    /// Raw data extracted from discord (might be useful later)
-    pub raw_data: Option<serde_json::Value>,
 }
 
 /// Detects and logs as ForcedOnline using messages the user sent while showing as offline/invisible. TODO For how long does the user get forced online, and TODO can we make it so when they join a VC while being set to offline it also sets them to ForcedOnline?

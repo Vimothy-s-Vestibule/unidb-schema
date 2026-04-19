@@ -60,11 +60,6 @@ CREATE TABLE connected_accounts (
   reasoning text NOT NULL,
 
 
-  -- Sync scheduling
-  last_synced_at timestamptz,
-  last_sync_error text,
-  sync_status text NOT NULL DEFAULT 'idle',
-  
 
   UNIQUE (vestibule_user_id, platform_id, platform_username),
   CHECK (mention_message_id IS NOT NULL OR reasoning IS NOT NULL)
@@ -77,7 +72,7 @@ CREATE TABLE external_content (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   account_id uuid NOT NULL REFERENCES connected_accounts(id) ON DELETE CASCADE,
 
-  content_type text NOT NULL,  -- 'github_repo', 'strava_activity', 'spotify_track'
+  content_type text NOT NULL,  -- 'github_repo', 'strava_activity', 'spotify_track' (NOT youtube — use youtube_videos/youtube_comments tables instead)
 
 
   raw_data jsonb NOT NULL,  -- Full API response
@@ -86,5 +81,7 @@ CREATE TABLE external_content (
   fetched_at timestamptz NOT NULL DEFAULT NOW(),
   updated_at timestamptz,
 
-  UNIQUE (account_id, content_hash)
+  UNIQUE (account_id, content_hash),
+  -- YouTube has dedicated tables: youtube_videos, youtube_comments
+  CHECK (content_type NOT IN ('youtube_video', 'youtube_comment', 'youtube_channel'))
 );
