@@ -10,7 +10,7 @@ CREATE TABLE scores (
   conscientiousness double precision NOT NULL,
   openness_to_experience double precision NOT NULL,
 
- -- Other interesting traits
+ -- Other interesting traits (experimental, TODO refine traits, consult with @no)
   agency double precision NOT NULL,
   achievement double precision NOT NULL,
   influence double precision NOT NULL,
@@ -36,7 +36,7 @@ CREATE TABLE skills (
 
   name text NOT NULL UNIQUE,
 
-  -- for skill similarity
+  -- name embedding for skill similarity
   embedding vector
 );
 
@@ -50,6 +50,6 @@ CREATE TABLE media_assets (
   -- The actual content
   bytes text NOT NULL,
 
-  -- For similarity with other media (TODO can we do across media types or only images <> images, etc.)
+  -- Embedding Of the actual image for similarity with other media (TODO can we do across media types or only images <> images, etc.)
   embedding vector
 );

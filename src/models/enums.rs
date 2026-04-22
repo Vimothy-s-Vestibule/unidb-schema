@@ -51,8 +51,6 @@ impl TryFrom<serenity::model::channel::ChannelType> for DiscordChannelType {
 #[sqlx(type_name = "text", rename_all = "snake_case")]
 #[serde(rename_all = "snake_case")]
 pub enum ActivitySource {
-    /// Discord rich presence
-    DiscordPresence,
     /// LLM-extracted from a message, external content, etc.
     LlmExtraction,
     /// Obtained from a connected_accounts account

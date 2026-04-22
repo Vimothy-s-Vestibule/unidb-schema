@@ -6,11 +6,15 @@ CREATE INDEX idx_message_reactions_message ON message_reactions(message_id);
 CREATE INDEX idx_message_reactions_user ON message_reactions(user_id);
 
 -- User presence: current status per user
-CREATE INDEX idx_presence_current ON user_presence(user_id) WHERE ended_at IS NULL;
--- User presence: historical queries "who was online at time X"
-CREATE INDEX idx_presence_history ON user_presence(user_id, started_at, ended_at);
+CREATE INDEX idx_presence_current_status ON discord_user_presence(user_id)
+  WHERE ended_at IS NULL AND presence_type = 'status';
+-- User presence: current activities per user
+CREATE INDEX idx_presence_current_activity ON discord_user_presence(user_id)
+  WHERE ended_at IS NULL AND presence_type = 'activity';
+-- User presence: enabling historical queries "who was online at time X"
+CREATE INDEX idx_presence_history ON discord_user_presence(user_id, started_at, ended_at);
 -- User presence: time-based queries
-CREATE INDEX idx_presence_time ON user_presence(started_at DESC);
+CREATE INDEX idx_presence_time ON discord_user_presence(started_at DESC);
 
 -- Messages: common queries
 CREATE INDEX idx_messages_sent_by ON messages(sent_by);
@@ -31,13 +35,9 @@ CREATE INDEX idx_user_skills_user_id ON user_skills(user_id);
 CREATE INDEX idx_connected_accounts_user_id ON connected_accounts(vestibule_user_id);
 
 -- User activities
-CREATE INDEX idx_user_activities_user ON user_activities(user_id) WHERE user_id IS NOT NULL;
-CREATE INDEX idx_user_activities_discord_user ON user_activities(discord_user_id) WHERE discord_user_id IS NOT NULL;
-CREATE INDEX idx_user_activities_type ON user_activities(activity_type);
-CREATE INDEX idx_user_activities_source ON user_activities(source);
-CREATE INDEX idx_user_activities_occurred ON user_activities(started_at DESC) WHERE started_at IS NOT NULL;
--- Current ongoing activities (discord presence)
-CREATE INDEX idx_user_activities_current ON user_activities(discord_user_id) WHERE ended_at IS NULL AND source = 'discord_presence';
+CREATE INDEX idx_user_activities_user ON user_activities(user_id);
+CREATE INDEX idx_user_activities_type ON user_activities(user_id, activity_type);
+CREATE INDEX idx_user_activities_started ON user_activities(user_id, started_at DESC);
 
 -- Vector similarity search (HNSW index)
 -- CREATE INDEX idx_scores_embedding ON scores

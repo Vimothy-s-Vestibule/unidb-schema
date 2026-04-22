@@ -1,4 +1,4 @@
-//! Database models for UniDB.
+//! Database models for unidb.
 //!
 //! # Module Organization
 //!
@@ -7,11 +7,11 @@
 //! - [`channel`] - Discord channels
 //! - [`message`] - Discord messages
 //! - [`reaction`] - Message reactions
-//! - [`presence`] - Online status tracking
+//! - [`presence`] - Online status and rich presence activities
 //! - [`score`] - HEXACO and behavioral traits
 //! - [`skill`] - Skills and evidence
 //! - [`connection`] - Connected third-party accounts
-//! - [`activity`] - Unified activities (LLM-extracted + Discord presence)
+//! - [`activity`] - LLM-extracted activities
 //! - [`media_asset`] - Media assets (profile pictures, etc)
 
 pub mod activity;
@@ -28,7 +28,6 @@ pub mod skill;
 pub mod user;
 pub mod youtube;
 
-// Re-export all types at module root for convenience
 pub use activity::Activity;
 pub use channel::DiscordChannel;
 pub use connection::{ConnectedAccount, ExternalContent, Platform};

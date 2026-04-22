@@ -5,7 +5,7 @@ CREATE TABLE jobs (
   job_type text NOT NULL, -- 'youtube_channel_scrape', 'discord_channel_scrape', 'strava_sync', etc.
   status text NOT NULL DEFAULT 'pending', -- 'pending', 'in_progress', 'completed', 'failed'
 
-  -- Worker tracking
+  -- Worker tracking, set both to NULL after
   locked_by_worker_id text, -- ID of the worker currently processing this
   locked_at timestamptz,
 

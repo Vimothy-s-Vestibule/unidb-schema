@@ -14,7 +14,6 @@ VALUES
   (gen_random_uuid(), 'Strava', 'https://strava.com', 'oauth_required'),
   (gen_random_uuid(), 'Spotify', 'https://spotify.com', 'oauth_required'),
   (gen_random_uuid(), 'LinkedIn', 'https://linkedin.com', 'unavailable'),
-  -- 
   (gen_random_uuid(), 'YouTube', 'https://youtube.com', 'public'),
   -- TODO curl -L -X GET "https://api.github.com/users/alex" -H "Accept: application/vnd.github+json"
   (gen_random_uuid(), 'GitHub', 'https://github.com', 'public'),
@@ -79,6 +78,7 @@ CREATE TABLE external_content (
   content_hash text,  -- md5(raw_data) for change detection (TODO maybe choose faster, better algo)
 
   fetched_at timestamptz NOT NULL DEFAULT NOW(),
+  -- If it was fetched multiple times, when it was fetched the last time
   updated_at timestamptz,
 
   UNIQUE (account_id, content_hash),

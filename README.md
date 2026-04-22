@@ -1,65 +1,64 @@
-# unidb-schema
+# unidb
 
-## A note on the database schema
+unidb is the central, unified postgres database for the Vestibule bot ecosystem.
 
-For simplicity, threads in a text channel with threads enabled (e.g. `#introductions`) and forum posts in a forum (e.g. `#server-projects`) are both handled as-, and called the same: "threads"
+Realtime events emitted by users, on Discord and on other platforms, are aggregated here, natural language extractions and evaluations of them are also stored in unidb for later retrieval through bots like Mnemos.
 
-## About `Array<Nullable<Text>>` and `Vec<Option<String>>`
+## Table architecture
 
-This is serialized like this because postgres cannot guarantee that any element in the array is not NULL or None in rust terms. I have written a helper `TextVec`, that guarantees that all values in it are some. Please use this newtype in the rust data model structs when contributing to the schema. It can be converted to a `Vec<String>` by doing `.deref()` or `*my_text_vector` or `my_string_vector: Vec<String> = my_text_vector.into()`.
+The `connected_accounts` table acts as the universal identity table.
+Identities are centralized to the `vestibule_users` table, all content (discord messages and discord-related metadata and external (`youtube_comments`, `youtube_videos`, `connected_accounts`) content) descends from the `id` (UUID) of an entry in `vestibule_users`.
 
-## Using the schema and data models in Rust
+NOTE: A `vestibule_users` entry does not strictly need to have a `discord_accounts` entry (but can have one or multiple linking to it via FK) so that users that have not joined the discord can be recorded in the database too.
 
-To add the schema and rust models as a dependency in a rust project:
+Many tables include nullable columns to store an LLM-generated evaluation or summary of that row. When INSERTing a row, these columns should be left blank as they will be populated by the processing pipeline.
 
-```toml
-unidb = { git = "https://github.com/Vimothy-s-Vestibule/unidb-schema" }
+## Project Structure
+
+```text
+.
+├── schema/                 # Source of truth: PostgreSQL schema definition files
+│   ├── 00_extensions.sql   
+│   ├── ...                 
+│   └── 99_indexes.sql      
+├── schema.sql              # Auto-generated unified SQL schema by make
+├── Makefile                # Run 'make' to rebuild schema.sql from all files in the schema/ directory
+└── src/
+    ├── models/             # Rust data structs mapped to SQL tables
+    ├── models.rs           # Module reexports
+    └── lib.rs              
 ```
 
-Other useful things to work with the db:
+## Contributing
 
-```toml
+When creating new files in the `schema/` folder, please pay attention to their order to ensure all foreign key relationships are satisfied.
 
-diesel = { version = "2.3.6", features = ["postgres", "chrono"] }
-diesel-async = { version = "0.7.4", features = ["postgres", "deadpool"] }
+`schema.sql` is auto-generated. Make changes in the `schema/*.sql` files and run `make rebuild` to generate it.
 
-# If you want to insert vectors use this to serialize them like:
-# pgvector::Vector::from(Vec::<f32>::new())
-pgvector = { version = "0.4.1", features = ["diesel"] }
-# For reading env vars from .env file
-dotenvy = "0.15.7"
-
-
-```
-
-Using it with tokio, diesel, diesel-async:
+### Example
 
 ```rust
-use unidb::diesel_schema::vestibule_users;
-use unidb::models::{DiscordMessage, VestibuleUserRecord};
+use unidb::models::{VestibuleUser, Message};
+use sqlx::postgres::PgPoolOptions;
 
-// ...
-let database_url = env::var("DATABASE_URL").map_err(|e| AppError::AppError(Box::new(e)))?;
+#[tokio::main]
+async fn main() -> Result<(), sqlx::Error> {
+    let database_url = std::env::var("DATABASE_URL").expect("DATABASE_URL must be set");
+    let pool = PgPoolOptions::new()
+        .connect(&database_url)
+        .await?;
 
+    let users = sqlx::query_as!(
+        VestibuleUser,
+        "SELECT * FROM vestibule_users LIMIT 10"
+    )
+    .fetch_all(&pool)
+    .await?;
 
+    for user in users {
+        println!("User ID: {}", user.id);
+    }
 
-let config = AsyncDieselConnectionManager::<diesel_async::AsyncPgConnection>::new(database_url);
-let pool = Pool::builder(config).build().unwrap();
-
- let mut conn = pool.get().await.unwrap();
-
-let all_users: Vec<(VestibuleUserRecord, DiscordMessage)> = vestibule_users::table
-            .inner_join(unidb::diesel_schema::messages::table)
-            .select((
-                VestibuleUserRecord::as_select(),
-                DiscordMessage::as_select(),
-            ))
-            .load(&mut conn)
-            .await
-            .unwrap_or_else(|e| {
-                eprintln!("Failed to fetch initial users: {}", e);
-                vec![]
-            });
-
-// ...
+    Ok(())
+}
 ```

@@ -2,14 +2,15 @@ CREATE TABLE youtube_videos (
   -- The part after youtube.com/watch?v=
   video_id text PRIMARY KEY,
 
-  channel_id uuid NOT NULL REFERENCES connected_accounts(id) ON DELETE CASCADE,
+  vestibule_channel_id uuid NOT NULL REFERENCES connected_accounts(id) ON DELETE CASCADE,
   title text NOT NULL,
   description text,
   published_at timestamptz NOT NULL,
   total_views bigint NOT NULL DEFAULT 0,
   total_likes bigint NOT NULL DEFAULT 0,
   total_comments bigint NOT NULL DEFAULT 0,
-  
+  keyword_tags text[],
+
   -- Content Details
   duration_seconds integer NOT NULL,
   broadcast_status text NOT NULL, -- Values: 'video', 'current_live', 'past_live', 'scheduled_live', 'none'
@@ -19,7 +20,6 @@ CREATE TABLE youtube_videos (
   transcript_asset_id uuid REFERENCES media_assets(id),
   -- Downloaded audio ID
   audio_asset_id uuid REFERENCES media_assets(id),
-  keyword_tags text[],
 
   added_at timestamptz DEFAULT NOW()
 );

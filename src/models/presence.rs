@@ -1,3 +1,6 @@
+//! User presence tracking models.
+//! Unified table for both online/offline status changes and rich presence activities.
+
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
@@ -5,22 +8,40 @@ use uuid::Uuid;
 
 use super::enums::PresenceStatus;
 
-/// Discord online/offline status change (event-sourced).
+/// A single presence record — either a status change or a rich presence activity.
+///
+/// When `presence_type` is `"status"`: `status` is set, activity fields are NULL.
+/// When `presence_type` is `"activity"`: `activity_type` + `name` are set, `status` is NULL.
 #[derive(Debug, Clone, FromRow, Serialize, Deserialize)]
 pub struct Presence {
     pub id: Uuid,
     pub user_id: i64,
 
-    /// Overall status.
-    pub status: PresenceStatus,
+    /// `"status"` or `"activity"`.
+    pub presence_type: String,
 
-    /// The first time the bot picked up that this status was happening (TODO can we get actual activity begin time from serenity)
+    /// Online/offline status (only for presence_type = "status").
+    pub status: Option<PresenceStatus>,
+
+    /// Maps to serenity's ActivityType: Playing, Streaming, Listening, Watching, Custom, Competing
+    pub activity_type: Option<String>,
+
+    /// Game name, song title, etc. (only for activities).
+    pub name: Option<String>,
+    /// Secondary line (e.g., "In Menu", "by Artist").
+    pub details: Option<String>,
+    /// Third line (e.g., "Playing Solo").
+    pub state: Option<String>,
+    /// Stream URL, Spotify link, etc.
+    pub url: Option<String>,
+
+    /// When this presence started.
     pub started_at: DateTime<Utc>,
-    /// NULL = current status.
+    /// NULL = current/still active.
     pub ended_at: Option<DateTime<Utc>>,
 }
 
-/// Detects and logs as ForcedOnline using messages the user sent while showing as offline/invisible. TODO For how long does the user get forced online, and TODO can we make it so when they join a VC while being set to offline it also sets them to ForcedOnline?
+/// Detects and logs as ForcedOnline using messages the user sent while showing as offline/invisible.
 #[derive(Debug, Clone, FromRow, Serialize, Deserialize)]
 pub struct ForcedOnlineEvidence {
     pub id: Uuid,
