@@ -8,7 +8,7 @@ use super::enums::YoutubeVideoBroadcastStatus;
 #[derive(Debug, Clone, FromRow, Serialize, Deserialize)]
 pub struct YoutubeVideo {
     pub video_id: String,
-    pub channel_id: Uuid,
+    pub channel_vestibule_id: Uuid,
     pub title: String,
     pub description: Option<String>,
     pub published_at: DateTime<Utc>,

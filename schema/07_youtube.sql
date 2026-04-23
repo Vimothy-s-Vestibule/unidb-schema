@@ -2,7 +2,7 @@ CREATE TABLE youtube_videos (
   -- The part after youtube.com/watch?v=
   video_id text PRIMARY KEY,
 
-  vestibule_channel_id uuid NOT NULL REFERENCES connected_accounts(id) ON DELETE CASCADE,
+  channel_vestibule_id uuid NOT NULL REFERENCES connected_accounts(id) ON DELETE CASCADE,
   title text NOT NULL,
   description text,
   published_at timestamptz NOT NULL,

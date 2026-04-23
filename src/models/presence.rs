@@ -17,9 +17,6 @@ pub struct Presence {
     pub id: Uuid,
     pub user_id: i64,
 
-    /// `"status"` or `"activity"`.
-    pub presence_type: String,
-
     /// Online/offline status (only for presence_type = "status").
     pub status: Option<PresenceStatus>,
 
@@ -39,14 +36,7 @@ pub struct Presence {
     pub started_at: DateTime<Utc>,
     /// NULL = current/still active.
     pub ended_at: Option<DateTime<Utc>>,
-}
 
-/// Detects and logs as ForcedOnline using messages the user sent while showing as offline/invisible.
-#[derive(Debug, Clone, FromRow, Serialize, Deserialize)]
-pub struct ForcedOnlineEvidence {
-    pub id: Uuid,
-    pub user_id: i64,
-    pub message_id: i64,
-    pub presence_id: Uuid,
-    pub detected_at: DateTime<Utc>,
+    /// Message ID that triggered the 'ForcedOnline' status
+    pub evidence_message_id: Option<i64>,
 }

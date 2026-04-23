@@ -31,15 +31,6 @@ CREATE TABLE discord_channels (
   parent_channel_id bigint REFERENCES discord_channels(channel_id)
 );
 
-CREATE TABLE skills (
-  id uuid PRIMARY KEY,
-
-  name text NOT NULL UNIQUE,
-
-  -- name embedding for skill similarity
-  embedding vector
-);
-
 -- For Things like profile pictures of discord accounts and Youtube commenter accounts/Youtube channel (inspired by seeing Reans' matching yt and discord pfps)
 CREATE TABLE media_assets (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
