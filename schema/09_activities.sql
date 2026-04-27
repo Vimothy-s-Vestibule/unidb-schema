@@ -9,7 +9,10 @@ CREATE TABLE user_facts_and_activities (
   -- Where this came from: 'llm_extraction', 'external_content', 'manual'
   source activity_source NOT NULL,
 
-  -- Type: 'took_job', 'timezone', 'location', 'hardware', 'editor', OR for skills: the skill name like 'Rust', 'Guitar'
+  -- If this includes some user generated content, this is the LLM eval of that
+  score_id uuid REFERENCES scores(id),
+
+  -- Type: 'took_job', 'timezone', 'location', 'primary_machine', 'editor', 'real_first' (real first name), 'real_last' (real last name), 'favorite_car', ..., OR for skills: the skill name like 'Rust', 'Guitar'
   type text NOT NULL,
   
   -- Value: "10km marathon", "UTC+2", "Neovim", "Senior Software Engineer @ Google".

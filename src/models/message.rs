@@ -2,11 +2,12 @@
 
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use sqlx::FromRow;
+use ormlite::Model;
 
 /// Discord message with processing pipeline metadata.
-#[derive(Debug, Clone, FromRow, Serialize, Deserialize)]
+#[derive(Debug, Clone, Model, Serialize, Deserialize)]
 pub struct Message {
+    #[ormlite(primary_key)]
     pub message_id: i64,
     pub channel_id: i64,
     pub sent_by: i64,

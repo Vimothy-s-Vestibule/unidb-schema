@@ -1,11 +1,11 @@
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use sqlx::FromRow;
+use ormlite::Model;
 use uuid::Uuid;
 
 use super::enums::{JobStatus, JobType};
 
-#[derive(Debug, Clone, FromRow, Serialize, Deserialize)]
+#[derive(Debug, Clone, Model, Serialize, Deserialize)]
 pub struct Job {
     pub id: Uuid,
     pub job_type: JobType,

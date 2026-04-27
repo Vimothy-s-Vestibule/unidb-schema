@@ -53,6 +53,7 @@ pub enum ActivityRecordType {
     Activity,
     Fact,
     Skill,
+    Emotion,
 }
 
 /// Where a user activity originated from

@@ -30,7 +30,7 @@ CREATE TYPE job_type AS ENUM (
 );
 
 CREATE TYPE activity_record_type AS ENUM (
-  'activity', 'fact', 'skill'
+  'activity', 'fact', 'skill', 'emotion'
 );
 
 CREATE TYPE youtube_video_broadcast_status AS ENUM (

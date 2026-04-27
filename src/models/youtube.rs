@@ -1,12 +1,13 @@
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use sqlx::FromRow;
+use ormlite::Model;
 use uuid::Uuid;
 
 use super::enums::YoutubeVideoBroadcastStatus;
 
-#[derive(Debug, Clone, FromRow, Serialize, Deserialize)]
+#[derive(Debug, Clone, Model, Serialize, Deserialize)]
 pub struct YoutubeVideo {
+    #[ormlite(primary_key)]
     pub video_id: String,
     pub channel_vestibule_id: Uuid,
     pub title: String,
@@ -27,8 +28,9 @@ pub struct YoutubeVideo {
     pub added_at: Option<DateTime<Utc>>,
 }
 
-#[derive(Debug, Clone, FromRow, Serialize, Deserialize)]
+#[derive(Debug, Clone, Model, Serialize, Deserialize)]
 pub struct YoutubeComment {
+    #[ormlite(primary_key)]
     pub comment_id: String,
     pub video_id: String,
 

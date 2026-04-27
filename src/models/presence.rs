@@ -3,7 +3,7 @@
 
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use sqlx::FromRow;
+use ormlite::Model;
 use uuid::Uuid;
 
 use super::enums::PresenceStatus;
@@ -12,7 +12,7 @@ use super::enums::PresenceStatus;
 ///
 /// When `presence_type` is `"status"`: `status` is set, activity fields are NULL.
 /// When `presence_type` is `"activity"`: `activity_type` + `name` are set, `status` is NULL.
-#[derive(Debug, Clone, FromRow, Serialize, Deserialize)]
+#[derive(Debug, Clone, Model, Serialize, Deserialize)]
 pub struct Presence {
     pub id: Uuid,
     pub user_id: i64,

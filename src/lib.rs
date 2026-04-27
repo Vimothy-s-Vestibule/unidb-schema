@@ -6,7 +6,7 @@ pub use scoring_schema::scoring_prompt;
 
 use serde::{Deserialize, Serialize};
 
-/// LLM scoring response for a user's intro
+/// LLM API scoring response
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct AiScoreResponse {
     pub username: String,
@@ -15,11 +15,4 @@ pub struct AiScoreResponse {
     pub behavioral: BehavioralTraits,
     pub activities: Vec<String>,
     pub embedding: Option<Vec<f32>>,
-}
-
-/// NATS message payload for processing.
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct NatsMessagePayload {
-    pub message_id: i64,
-    pub is_intro: bool,
 }

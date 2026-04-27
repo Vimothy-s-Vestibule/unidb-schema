@@ -3,13 +3,13 @@
 use chrono::{DateTime, Utc};
 use pgvector::Vector;
 use serde::{Deserialize, Serialize};
-use sqlx::FromRow;
+use ormlite::Model;
 use uuid::Uuid;
 
 use super::enums::PlatformAccess;
 
 /// An external platform that users can connect to (e.g., GitHub, Spotify, Strava).
-#[derive(Debug, Clone, FromRow, Serialize, Deserialize)]
+#[derive(Debug, Clone, Model, Serialize, Deserialize)]
 pub struct Platform {
     pub id: Uuid,
     pub platform_name: String,
@@ -20,7 +20,7 @@ pub struct Platform {
 
 /// A user's linked account on a specific platform.
 /// Sync state is tracked exclusively via the `jobs` table.
-#[derive(Debug, Clone, FromRow, Serialize, Deserialize)]
+#[derive(Debug, Clone, Model, Serialize, Deserialize)]
 pub struct ConnectedAccount {
     pub id: Uuid,
     pub vestibule_user_id: Uuid,
@@ -43,7 +43,7 @@ pub struct ConnectedAccount {
 
 /// Raw content fetched from an external platform via a connected account.
 /// YouTube content should NOT go here — use youtube_videos/youtube_comments instead.
-#[derive(Debug, Clone, FromRow, Serialize, Deserialize)]
+#[derive(Debug, Clone, Model, Serialize, Deserialize)]
 pub struct ExternalContent {
     pub id: Uuid,
     pub account_id: Uuid,

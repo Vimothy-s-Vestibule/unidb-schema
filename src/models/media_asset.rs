@@ -2,11 +2,11 @@
 
 use pgvector::Vector;
 use serde::{Deserialize, Serialize};
-use sqlx::FromRow;
+use ormlite::Model;
 use uuid::Uuid;
 
 /// Media asset (e.g. profile pictures).
-#[derive(Debug, Clone, FromRow, Serialize, Deserialize)]
+#[derive(Debug, Clone, Model, Serialize, Deserialize)]
 pub struct MediaAsset {
     pub id: Uuid,
 

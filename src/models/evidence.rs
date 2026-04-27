@@ -1,9 +1,9 @@
 use serde::{Deserialize, Serialize};
-use sqlx::FromRow;
+use ormlite::Model;
 use uuid::Uuid;
 
 /// Message evidence supporting an inferred fact or activity
-#[derive(Debug, Clone, FromRow, Serialize, Deserialize)]
+#[derive(Debug, Clone, Model, Serialize, Deserialize)]
 pub struct FactAndActivityEvidence {
     pub id: Uuid,
     pub fact_or_activity_id: Uuid,

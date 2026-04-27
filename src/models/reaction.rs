@@ -2,11 +2,11 @@
 
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use sqlx::FromRow;
+use ormlite::Model;
 use uuid::Uuid;
 
 /// Emoji reaction on a Discord message.
-#[derive(Debug, Clone, FromRow, Serialize, Deserialize)]
+#[derive(Debug, Clone, Model, Serialize, Deserialize)]
 pub struct MessageReaction {
     pub id: Uuid,
     pub message_id: i64,
@@ -16,7 +16,7 @@ pub struct MessageReaction {
 }
 
 /// A Discord emoji (unicode or custom).
-#[derive(Debug, Clone, FromRow, Serialize, Deserialize)]
+#[derive(Debug, Clone, Model, Serialize, Deserialize)]
 pub struct DiscordEmoji {
     pub id: Uuid,
     /// Unicode emoji string or custom emoji snowflake ID

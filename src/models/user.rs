@@ -1,17 +1,14 @@
 use chrono::{DateTime, Utc};
+use ormlite::Model;
 use serde::{Deserialize, Serialize};
-use sqlx::FromRow;
 use uuid::Uuid;
 
 /// Main user entity. A user can have multiple Discord accounts.
-#[derive(Debug, Clone, FromRow, Serialize, Deserialize)]
+#[derive(Debug, Clone, Model, Serialize, Deserialize)]
 pub struct VestibuleUser {
     /// unique (TODO UUIDv7?) user id
     pub id: Uuid,
 
-    // Real names extracted from messages (TODO extract, not display name)
-    pub real_first: Option<String>,
-    pub real_last: Option<String>,
     pub nickname: Option<String>,
 
     // Introduction message reference
@@ -29,8 +26,9 @@ pub struct VestibuleUser {
 }
 
 /// Discord account linked to a VestibuleUser.
-#[derive(Debug, Clone, FromRow, Serialize, Deserialize)]
+#[derive(Debug, Clone, Model, Serialize, Deserialize)]
 pub struct DiscordAccount {
+    #[ormlite(primary_key)]
     pub discord_user_id: i64,
     pub vestibule_user_id: Uuid,
     pub username: String,

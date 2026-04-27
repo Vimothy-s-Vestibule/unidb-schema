@@ -3,8 +3,6 @@
 CREATE TABLE vestibule_users (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
 
-  real_first text,
-  real_last text,
   nickname text,
 
   -- FK added via ALTER TABLE after messages exists, It can be null if we add users from outside of the discord and because writing an intro is not mandatory anymore
