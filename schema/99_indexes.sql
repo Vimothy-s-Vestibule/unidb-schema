@@ -7,10 +7,10 @@ CREATE INDEX idx_message_reactions_user ON message_reactions(user_id);
 
 -- User presence: current status per user
 CREATE INDEX idx_presence_current_status ON discord_user_presence(user_id)
-  WHERE ended_at IS NULL AND presence_type = 'status';
+  WHERE ended_at IS NULL AND status IS NOT NULL;
 -- User presence: current activities per user
 CREATE INDEX idx_presence_current_activity ON discord_user_presence(user_id)
-  WHERE ended_at IS NULL AND presence_type = 'activity';
+  WHERE ended_at IS NULL AND activity_type IS NOT NULL;
 -- User presence: enabling historical queries "who was online at time X"
 CREATE INDEX idx_presence_history ON discord_user_presence(user_id, started_at, ended_at);
 -- User presence: time-based queries
@@ -51,4 +51,3 @@ CREATE INDEX idx_user_facts_and_activities_current ON user_facts_and_activities(
 CREATE INDEX idx_youtube_comments_video ON youtube_comments(video_id);
 CREATE INDEX idx_youtube_comments_author ON youtube_comments(author_channel_id);
 CREATE INDEX idx_youtube_comments_published ON youtube_comments(published_at DESC);
-CREATE INDEX idx_youtube_videos_channel ON youtube_videos(channel_id);

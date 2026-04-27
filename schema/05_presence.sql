@@ -3,8 +3,7 @@ CREATE TABLE discord_user_presence (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id bigint NOT NULL REFERENCES discord_accounts(discord_user_id) ON DELETE CASCADE,
 
-  -- online, forced_online, absent, do_not_disturb, offline
-  status text,
+  status presence_status,
 
   -- NULL when no activity is currently happening
   activity_type text,

@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 use sqlx::Type;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Type, Default)]
-#[sqlx(type_name = "text", rename_all = "snake_case")]
+#[sqlx(type_name = "discord_channel_type", rename_all = "snake_case")]
 #[serde(rename_all = "snake_case")]
 pub enum DiscordChannelType {
     #[default]
@@ -46,9 +46,18 @@ impl TryFrom<serenity::model::channel::ChannelType> for DiscordChannelType {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Type)]
+#[sqlx(type_name = "activity_record_type", rename_all = "snake_case")]
+#[serde(rename_all = "snake_case")]
+pub enum ActivityRecordType {
+    Activity,
+    Fact,
+    Skill,
+}
+
 /// Where a user activity originated from
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Type)]
-#[sqlx(type_name = "text", rename_all = "snake_case")]
+#[sqlx(type_name = "activity_source", rename_all = "snake_case")]
 #[serde(rename_all = "snake_case")]
 pub enum ActivitySource {
     /// LLM-extracted from a message, external content, etc.
@@ -61,7 +70,7 @@ pub enum ActivitySource {
 
 /// Discord online status
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Type)]
-#[sqlx(type_name = "text", rename_all = "snake_case")]
+#[sqlx(type_name = "presence_status", rename_all = "snake_case")]
 #[serde(rename_all = "snake_case")]
 pub enum PresenceStatus {
     Online,
@@ -73,7 +82,7 @@ pub enum PresenceStatus {
 
 /// How external platform data can be accessed.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Type)]
-#[sqlx(type_name = "text", rename_all = "snake_case")]
+#[sqlx(type_name = "platform_access", rename_all = "snake_case")]
 #[serde(rename_all = "snake_case")]
 pub enum PlatformAccess {
     /// Public API to get user data, no auth needed
@@ -84,9 +93,18 @@ pub enum PlatformAccess {
     Unavailable,
 }
 
-/// Status for the async processing pipeline (general triage, skills, personality). TODO include significance here?
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Type)]
+#[sqlx(type_name = "job_type", rename_all = "snake_case")]
+#[serde(rename_all = "snake_case")]
+pub enum JobType {
+    YoutubeChannelRetrieval,
+    DiscordChannelSync,
+    StravaRetrieval,
+    LinkedinScrape,
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Type, Default)]
-#[sqlx(type_name = "text", rename_all = "snake_case")]
+#[sqlx(type_name = "job_status", rename_all = "snake_case")]
 #[serde(rename_all = "snake_case")]
 pub enum JobStatus {
     #[default]
@@ -97,7 +115,10 @@ pub enum JobStatus {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Type)]
-#[sqlx(type_name = "text", rename_all = "snake_case")]
+#[sqlx(
+    type_name = "youtube_video_broadcast_status",
+    rename_all = "snake_case"
+)]
 #[serde(rename_all = "snake_case")]
 pub enum YoutubeVideoBroadcastStatus {
     Video,

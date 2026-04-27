@@ -4,10 +4,10 @@ CREATE TABLE user_facts_and_activities (
   user_id uuid NOT NULL REFERENCES vestibule_users(id) ON DELETE CASCADE,
 
   -- Is this an 'activity' (has timeline/duration), a 'fact' (stateful knowledge), or a 'skill'
-  record_type text NOT NULL CHECK (record_type IN ('activity', 'fact', 'skill')),
+  record_type activity_record_type NOT NULL,
 
   -- Where this came from: 'llm_extraction', 'external_content', 'manual'
-  source text NOT NULL,
+  source activity_source NOT NULL,
 
   -- Type: 'took_job', 'timezone', 'location', 'hardware', 'editor', OR for skills: the skill name like 'Rust', 'Guitar'
   type text NOT NULL,

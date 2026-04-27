@@ -3,12 +3,11 @@ CREATE TABLE social_platforms (
   platform_name text NOT NULL UNIQUE,
   -- URL: https://strava.com https://spotify.com https://linkedin.com ...
   homepage text NOT NULL,
-  -- public: can fetch with username/public data only, oauth_required: needs user auth, unavailable: no API access, but still added because mentioned by user(s)
-  access_type text NOT NULL,
+  access_type platform_access NOT NULL,
   logo uuid REFERENCES media_assets(id)
 );
 
--- Seed initial data
+-- Seed initial social platforms, more can be added anytime
 INSERT INTO social_platforms (id, platform_name, homepage, access_type)
 VALUES
   (gen_random_uuid(), 'Strava', 'https://strava.com', 'oauth_required'),
@@ -62,26 +61,4 @@ CREATE TABLE connected_accounts (
 
   UNIQUE (vestibule_user_id, platform_id, platform_username),
   CHECK (mention_message_id IS NOT NULL OR reasoning IS NOT NULL)
-);
-
-
--- Raw data fetched from external platforms
--- Depends on: connected_accounts
-CREATE TABLE external_content (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  account_id uuid NOT NULL REFERENCES connected_accounts(id) ON DELETE CASCADE,
-
-  content_type text NOT NULL,  -- 'github_repo', 'strava_activity', 'spotify_track' (NOT youtube — use youtube_videos/youtube_comments tables instead)
-
-
-  raw_data jsonb NOT NULL,  -- Full API response
-  content_hash text,  -- md5(raw_data) for change detection (TODO maybe choose faster, better algo)
-
-  fetched_at timestamptz NOT NULL DEFAULT NOW(),
-  -- If it was fetched multiple times, when it was fetched the last time
-  updated_at timestamptz,
-
-  UNIQUE (account_id, content_hash),
-  -- YouTube has dedicated tables: youtube_videos, youtube_comments
-  CHECK (content_type NOT IN ('youtube_video', 'youtube_comment', 'youtube_channel'))
 );

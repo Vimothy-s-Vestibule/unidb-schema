@@ -13,7 +13,7 @@ CREATE TABLE youtube_videos (
 
   -- Content Details
   duration_seconds integer NOT NULL,
-  broadcast_status text NOT NULL, -- Values: 'video', 'current_live', 'past_live', 'scheduled_live', 'none'
+  broadcast_status youtube_video_broadcast_status NOT NULL, -- Values: 'video', 'current_live', 'past_live', 'scheduled_live', 'none'
   
   -- Media & Discovery
   thumbnail_asset_id uuid REFERENCES media_assets(id),

@@ -3,12 +3,12 @@ use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
 use uuid::Uuid;
 
-use super::enums::JobStatus;
+use super::enums::{JobStatus, JobType};
 
 #[derive(Debug, Clone, FromRow, Serialize, Deserialize)]
 pub struct Job {
     pub id: Uuid,
-    pub job_type: String,
+    pub job_type: JobType,
     pub status: JobStatus,
     pub locked_by_worker_id: Option<String>,
     pub locked_at: Option<DateTime<Utc>>,

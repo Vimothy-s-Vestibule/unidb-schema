@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
 use uuid::Uuid;
 
-use super::enums::ActivitySource;
+use super::enums::{ActivityRecordType, ActivitySource};
 
 /// Activity or Fact extracted from messages or external content.
 #[derive(Debug, Clone, FromRow, Serialize, Deserialize)]
@@ -14,7 +14,7 @@ pub struct UserFactAndActivity {
     pub id: Uuid,
     pub user_id: Uuid,
 
-    pub record_type: String, // 'activity', 'fact', or 'skill'
+    pub record_type: ActivityRecordType, // 'activity', 'fact', or 'skill'
     pub source: ActivitySource,
     pub r#type: String, // e.g. skill name
     pub value: String, // e.g. proficiency description

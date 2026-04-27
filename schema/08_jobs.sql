@@ -2,8 +2,8 @@ CREATE TABLE jobs (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   
   -- Job metadata
-  job_type text NOT NULL, -- 'youtube_channel_scrape', 'discord_channel_scrape', 'strava_sync', etc.
-  status text NOT NULL DEFAULT 'pending', -- 'pending', 'in_progress', 'completed', 'failed'
+  job_type job_type NOT NULL, -- 'youtube_channel_scrape', 'discord_channel_scrape', 'strava_sync', etc.
+  status job_status NOT NULL DEFAULT 'pending', -- 'pending', 'in_progress', 'completed', 'failed'
 
   -- Worker tracking, set both to NULL after
   locked_by_worker_id text, -- ID of the worker currently processing this

@@ -1,4 +1,5 @@
 -- Tables without foreign keys go here
+
 CREATE TABLE scores (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
 
@@ -26,8 +27,7 @@ CREATE TABLE scores (
 CREATE TABLE discord_channels (
   channel_id bigint PRIMARY KEY,
   name text NOT NULL,
-  -- discord channel type: text, text_thread, forum_post, voice, forum, stage, category
-  channel_type text NOT NULL,
+  channel_type discord_channel_type NOT NULL,
   parent_channel_id bigint REFERENCES discord_channels(channel_id)
 );
 
