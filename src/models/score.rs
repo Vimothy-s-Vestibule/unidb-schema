@@ -1,8 +1,8 @@
 //! Personality scoring models (HEXACO + behavioral traits).
 
+use ormlite::Model;
 use pgvector::Vector;
 use serde::{Deserialize, Serialize};
-use ormlite::Model;
 use uuid::Uuid;
 
 /// HEXACO personality dimensions (0.0 - 1.0 scale).

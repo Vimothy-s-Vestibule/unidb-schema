@@ -14,3 +14,10 @@ CREATE TABLE messages (
 
   in_reply_to bigint REFERENCES messages(message_id)
 );
+
+CREATE TABLE message_edits (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  message_id bigint NOT NULL REFERENCES messages(message_id) ON DELETE CASCADE,
+  old_content text NOT NULL,
+  edited_at timestamptz NOT NULL DEFAULT NOW()
+);

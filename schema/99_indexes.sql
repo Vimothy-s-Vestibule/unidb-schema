@@ -28,6 +28,9 @@ CREATE INDEX idx_messages_in_reply_to ON messages(in_reply_to) WHERE in_reply_to
 CREATE INDEX idx_messages_active ON messages(channel_id, sent_at DESC)
   WHERE deleted_at IS NULL;
 
+-- Message edits
+CREATE INDEX idx_message_edits_message_id ON message_edits(message_id, edited_at ASC);
+
 
 -- Connected accounts
 CREATE INDEX idx_connected_accounts_user_id ON connected_accounts(vestibule_user_id);
