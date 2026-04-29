@@ -5,16 +5,23 @@ use serde::{Deserialize, Serialize};
 use ormlite::Model;
 use uuid::Uuid;
 
-/// Media asset (e.g. profile pictures).
+/// Media asset (e.g. profile pictures, discord attachments).
 #[derive(Debug, Clone, Model, Serialize, Deserialize)]
 pub struct MediaAsset {
+    #[ormlite(primary_key)]
     pub id: Uuid,
 
     /// HTML content-type
     pub content_type: String,
 
-    /// The actual content
-    pub bytes: String,
+    /// S3 object key used in the Garage bucket
+    pub object_key: String,
+
+    /// Size of the asset in bytes (useful for caching constraints)
+    pub size_bytes: Option<i64>,
+
+    /// SHA-256 hash of the content for deduplication and cache integrity (ETag)
+    pub content_hash: Option<String>,
 
     /// For similarity with other media
     #[serde(skip)]
