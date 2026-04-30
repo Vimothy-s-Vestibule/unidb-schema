@@ -31,6 +31,11 @@ CREATE INDEX idx_messages_active ON messages(channel_id, sent_at DESC)
 -- Message edits
 CREATE INDEX idx_message_edits_message_id ON message_edits(message_id, edited_at ASC);
 
+-- Partial index for active message attachments
+CREATE INDEX idx_message_attachments_active ON message_attachments(message_id)
+  WHERE deleted_at IS NULL;
+CREATE INDEX idx_message_attachments_asset_id ON message_attachments(asset_id);
+
 
 -- Connected accounts
 CREATE INDEX idx_connected_accounts_user_id ON connected_accounts(vestibule_user_id);

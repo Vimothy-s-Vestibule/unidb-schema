@@ -38,16 +38,14 @@ CREATE TABLE media_assets (
   -- HTML content-type
   content_type text NOT NULL,
 
-  -- S3 object key used in the Garage (or any S3-compatible) storage bucket.
+  -- S3 object key
   -- Format: `<type>/<id>.<ext>` or similar.
   object_key text NOT NULL UNIQUE,
 
   -- Size of the asset in bytes (useful for caching logic/limits)
   size_bytes bigint,
 
-  -- SHA-256 hash of the file content. 
-  -- 1) Prevents uploading the exact same file twice (deduplication).
-  -- 2) Useful for ETag headers and cache integrity checks.
+  -- SHA-256 hash of the file content.
   content_hash text UNIQUE,
 
   -- Embedding Of the actual image for similarity with other media (TODO can we do across media types or only images <> images, etc.)
