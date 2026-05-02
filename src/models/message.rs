@@ -6,6 +6,7 @@ use ormlite::Model;
 
 /// Discord message with processing pipeline metadata.
 #[derive(Debug, Clone, Model, Serialize, Deserialize)]
+#[ormlite(table = "messages")]
 pub struct Message {
     #[ormlite(primary_key)]
     pub message_id: i64,

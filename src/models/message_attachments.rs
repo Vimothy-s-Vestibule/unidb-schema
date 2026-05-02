@@ -5,6 +5,7 @@ use uuid::Uuid;
 
 /// Link between messages and media assets.
 #[derive(Debug, Clone, Model, Serialize, Deserialize)]
+#[ormlite(table = "message_attachments")]
 pub struct MessageAttachment {
     #[ormlite(primary_key)]
     pub id: Uuid,

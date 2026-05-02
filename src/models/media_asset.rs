@@ -7,6 +7,7 @@ use uuid::Uuid;
 
 /// Media asset (e.g. profile pictures, discord attachments).
 #[derive(Debug, Clone, Model, Serialize, Deserialize)]
+#[ormlite(table = "media_assets")]
 pub struct MediaAsset {
     #[ormlite(primary_key)]
     pub id: Uuid,

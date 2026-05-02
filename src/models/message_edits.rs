@@ -7,6 +7,7 @@ use uuid::Uuid;
 
 /// History of message edits.
 #[derive(Debug, Clone, Model, Serialize, Deserialize)]
+#[ormlite(table = "message_edits")]
 pub struct MessageEdit {
     #[ormlite(primary_key)]
     pub id: Uuid,

@@ -13,6 +13,7 @@ use super::enums::PresenceStatus;
 /// When `presence_type` is `"status"`: `status` is set, activity fields are NULL.
 /// When `presence_type` is `"activity"`: `activity_type` + `name` are set, `status` is NULL.
 #[derive(Debug, Clone, Model, Serialize, Deserialize)]
+#[ormlite(table = "discord_user_presence")]
 pub struct Presence {
     pub id: Uuid,
     pub user_id: i64,

@@ -5,6 +5,7 @@ use uuid::Uuid;
 
 /// Main user entity. A user can have multiple Discord accounts.
 #[derive(Debug, Clone, Model, Serialize, Deserialize)]
+#[ormlite(table = "vestibule_users")]
 pub struct VestibuleUser {
     /// unique (TODO UUIDv7?) user id
     pub id: Uuid,
@@ -27,6 +28,7 @@ pub struct VestibuleUser {
 
 /// Discord account linked to a VestibuleUser.
 #[derive(Debug, Clone, Model, Serialize, Deserialize)]
+#[ormlite(table = "discord_accounts")]
 pub struct DiscordAccount {
     #[ormlite(primary_key)]
     pub discord_user_id: i64,

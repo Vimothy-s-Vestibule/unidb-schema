@@ -10,6 +10,7 @@ use super::enums::PlatformAccess;
 
 /// An external platform that users can connect to (e.g., GitHub, Spotify, Strava).
 #[derive(Debug, Clone, Model, Serialize, Deserialize)]
+#[ormlite(table = "social_platforms")]
 pub struct Platform {
     pub id: Uuid,
     pub platform_name: String,
@@ -21,6 +22,7 @@ pub struct Platform {
 /// A user's linked account on a specific platform.
 /// Sync state is tracked exclusively via the `jobs` table.
 #[derive(Debug, Clone, Model, Serialize, Deserialize)]
+#[ormlite(table = "connected_accounts")]
 pub struct ConnectedAccount {
     pub id: Uuid,
     pub vestibule_user_id: Uuid,
@@ -44,6 +46,7 @@ pub struct ConnectedAccount {
 /// Raw content fetched from an external platform via a connected account.
 /// YouTube content should NOT go here — use youtube_videos/youtube_comments instead.
 #[derive(Debug, Clone, Model, Serialize, Deserialize)]
+#[ormlite(table = "external_content")]
 pub struct ExternalContent {
     pub id: Uuid,
     pub account_id: Uuid,

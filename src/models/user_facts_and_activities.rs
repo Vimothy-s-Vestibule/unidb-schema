@@ -10,6 +10,7 @@ use super::enums::{ActivityRecordType, ActivitySource};
 
 /// Activity or Fact extracted from messages or external content.
 #[derive(Debug, Clone, Model, Serialize, Deserialize)]
+#[ormlite(table = "user_facts_and_activities")]
 pub struct UserFactAndActivity {
     pub id: Uuid,
     pub user_id: Uuid,

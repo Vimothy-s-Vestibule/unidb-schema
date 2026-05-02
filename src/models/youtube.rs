@@ -6,6 +6,7 @@ use uuid::Uuid;
 use super::enums::YoutubeVideoBroadcastStatus;
 
 #[derive(Debug, Clone, Model, Serialize, Deserialize)]
+#[ormlite(table = "youtube_videos")]
 pub struct YoutubeVideo {
     #[ormlite(primary_key)]
     pub video_id: String,
@@ -29,6 +30,7 @@ pub struct YoutubeVideo {
 }
 
 #[derive(Debug, Clone, Model, Serialize, Deserialize)]
+#[ormlite(table = "youtube_comments")]
 pub struct YoutubeComment {
     #[ormlite(primary_key)]
     pub comment_id: String,

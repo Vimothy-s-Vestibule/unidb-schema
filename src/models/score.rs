@@ -29,6 +29,7 @@ pub struct BehavioralTraits {
 }
 
 #[derive(Debug, Clone, Model, Serialize, Deserialize)]
+#[ormlite(table = "scores")]
 pub struct Score {
     pub id: Uuid,
 

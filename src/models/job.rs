@@ -6,6 +6,7 @@ use uuid::Uuid;
 use super::enums::{JobStatus, JobType};
 
 #[derive(Debug, Clone, Model, Serialize, Deserialize)]
+#[ormlite(table = "jobs")]
 pub struct Job {
     pub id: Uuid,
     pub job_type: JobType,
