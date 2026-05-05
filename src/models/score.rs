@@ -1,5 +1,3 @@
-//! Personality scoring models (HEXACO + behavioral traits).
-
 use ormlite::Model;
 use pgvector::Vector;
 use serde::{Deserialize, Serialize};

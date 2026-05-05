@@ -10,6 +10,7 @@ pub struct VestibuleUser {
     /// unique (TODO UUIDv7?) user id
     pub id: Uuid,
 
+    // Real nickname ( TODO may be said in intro message)
     pub nickname: Option<String>,
 
     // Introduction message reference

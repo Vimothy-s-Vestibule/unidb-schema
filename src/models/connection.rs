@@ -1,9 +1,7 @@
-//! External platform connection models.
-
 use chrono::{DateTime, Utc};
+use ormlite::Model;
 use pgvector::Vector;
 use serde::{Deserialize, Serialize};
-use ormlite::Model;
 use uuid::Uuid;
 
 use super::enums::PlatformAccess;

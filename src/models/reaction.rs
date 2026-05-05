@@ -1,8 +1,6 @@
-//! Message reaction and emoji models.
-
 use chrono::{DateTime, Utc};
-use serde::{Deserialize, Serialize};
 use ormlite::Model;
+use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 /// Emoji reaction on a Discord message.

@@ -1,8 +1,6 @@
-//! Media asset models.
-
+use ormlite::Model;
 use pgvector::Vector;
 use serde::{Deserialize, Serialize};
-use ormlite::Model;
 use uuid::Uuid;
 
 /// Media asset (e.g. profile pictures, discord attachments).

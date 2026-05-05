@@ -1,8 +1,6 @@
-//! Discord message model.
-
 use chrono::{DateTime, Utc};
-use serde::{Deserialize, Serialize};
 use ormlite::Model;
+use serde::{Deserialize, Serialize};
 
 /// Discord message with processing pipeline metadata.
 #[derive(Debug, Clone, Model, Serialize, Deserialize)]

@@ -1,5 +1,3 @@
-//! Discord message edit model.
-
 use chrono::{DateTime, Utc};
 use ormlite::Model;
 use serde::{Deserialize, Serialize};

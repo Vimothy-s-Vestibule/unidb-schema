@@ -1,9 +1,8 @@
-//! User presence tracking models.
 //! Unified table for both online/offline status changes and rich presence activities.
 
 use chrono::{DateTime, Utc};
-use serde::{Deserialize, Serialize};
 use ormlite::Model;
+use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 use super::enums::PresenceStatus;

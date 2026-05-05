@@ -1,6 +1,4 @@
-//! Database models for unidb.
-//!
-//! # Module Organization
+//! Rust models for unidb.
 //!
 //! - [`enums`] - All database TEXT enums
 //! - [`user`] - VestibuleUser, DiscordAccount
@@ -8,7 +6,7 @@
 //! - [`message`] - Discord messages
 //! - [`reaction`] - Message reactions
 //! - [`presence`] - Online status and rich presence activities
-//! - [`score`] - HEXACO and behavioral traits
+//! - [`score`] - HEXACO and other interesting traits (subject to experimentation)
 //! - [`skill`] - Skills and evidence
 //! - [`connection`] - Connected third-party accounts
 //! - [`activity`] - LLM-extracted activities

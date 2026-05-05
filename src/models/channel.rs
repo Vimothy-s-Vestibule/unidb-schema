@@ -1,5 +1,3 @@
-//! Discord channel model.
-
 use ormlite::Model;
 use serde::{Deserialize, Serialize};
 
