@@ -13,6 +13,7 @@ pub enum DiscordChannelType {
     Forum,
     Stage,
     Category,
+    PublicThread,
 }
 
 impl std::fmt::Display for DiscordChannelType {
@@ -25,6 +26,7 @@ impl std::fmt::Display for DiscordChannelType {
             Self::Forum => "forum",
             Self::Stage => "stage",
             Self::Category => "category",
+            Self::PublicThread => "public_thread",
         };
         f.write_str(s)
     }
@@ -41,6 +43,7 @@ impl TryFrom<serenity::model::channel::ChannelType> for DiscordChannelType {
             CT::Forum => Ok(Self::Forum),
             CT::Category => Ok(Self::Category),
             CT::Stage => Ok(Self::Stage),
+            CT::PublicThread => Ok(Self::PublicThread),
             other => Err(format!("unsupported channel type: {other:?}")),
         }
     }
