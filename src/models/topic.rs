@@ -1,5 +1,6 @@
 use chrono::{DateTime, Utc};
 use ormlite::Model;
+use pgvector::Vector;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -8,6 +9,7 @@ use uuid::Uuid;
 pub struct Topic {
     pub id: Uuid,
     pub name: String,
+    pub embedding: Option<Vector>,
 }
 
 #[derive(Debug, Clone, Model, Serialize, Deserialize)]

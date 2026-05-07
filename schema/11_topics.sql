@@ -1,7 +1,8 @@
 CREATE TABLE topic (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     -- LLM-extracted concise summary of what the topic messages discuss
-    name text NOT NULL
+    name text NOT NULL,
+    embedding vector
 );
 
 
