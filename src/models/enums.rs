@@ -7,13 +7,14 @@ use sqlx::Type;
 pub enum DiscordChannelType {
     #[default]
     Text,
+    /// Could also be serenity::PrivateThread
     TextThread,
+    PublicThread,
     ForumPost,
     Voice,
     Forum,
     Stage,
     Category,
-    PublicThread,
 }
 
 impl std::fmt::Display for DiscordChannelType {
@@ -21,12 +22,12 @@ impl std::fmt::Display for DiscordChannelType {
         let s = match self {
             Self::Text => "text",
             Self::TextThread => "text_thread",
+            Self::PublicThread => "public_thread",
             Self::ForumPost => "forum_post",
             Self::Voice => "voice",
             Self::Forum => "forum",
             Self::Stage => "stage",
             Self::Category => "category",
-            Self::PublicThread => "public_thread",
         };
         f.write_str(s)
     }
@@ -44,6 +45,7 @@ impl TryFrom<serenity::model::channel::ChannelType> for DiscordChannelType {
             CT::Category => Ok(Self::Category),
             CT::Stage => Ok(Self::Stage),
             CT::PublicThread => Ok(Self::PublicThread),
+            CT::PrivateThread => Ok(Self::TextThread),
             other => Err(format!("unsupported channel type: {other:?}")),
         }
     }

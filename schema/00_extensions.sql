@@ -6,7 +6,7 @@ SET search_path TO public;
 
 -- Enums
 CREATE TYPE discord_channel_type AS ENUM (
-  'text', 'text_thread', 'forum_post', 'voice', 'forum', 'stage', 'category'
+  'text', 'text_thread', 'public_thread', 'forum_post', 'voice', 'forum', 'stage', 'category'
 );
 
 CREATE TYPE activity_source AS ENUM (
