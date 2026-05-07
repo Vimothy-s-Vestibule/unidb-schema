@@ -41,7 +41,7 @@ pub use message_edits::MessageEdit;
 pub use presence::Presence;
 pub use reaction::{DiscordEmoji, MessageReaction};
 pub use score::{BehavioralTraits, HexacoTraits, Score};
-pub use topic::{Topic, TopicMessageRelation};
+pub use topic::{MessageClassificationAttempt, Topic, TopicMessageRelation};
 pub use user::{DiscordAccount, VestibuleUser};
 pub use user_facts_and_activities::UserFactAndActivity;
 pub use youtube::{YoutubeComment, YoutubeVideo};
