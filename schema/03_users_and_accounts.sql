@@ -29,6 +29,9 @@ CREATE TABLE discord_accounts (
   display_name text NOT NULL
 );
 
+INSERT INTO vestibule_users VALUES ('3d299903-2abf-4930-b2b9-8b083c1d21b2', 'Deleted User', NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO discord_accounts VALUES ('0000000000', '3d299903-2abf-4930-b2b9-8b083c1d21b2', 'deleteduser', 'Deleted User');
+
 -- FK from messages to discord_accounts (deferred due to dependency order)
 ALTER TABLE messages 
   ADD CONSTRAINT fk_messages_sent_by 
