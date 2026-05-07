@@ -21,6 +21,9 @@ CREATE TABLE scores (
   technical_competence double precision NOT NULL,
   busyness double precision NOT NULL,
 
+  -- Nice human-readable summary of what the user likes to talk about and what their personality is like (TODO independent of the score numbers!!!!)
+  llm_summary text,
+
   embedding vector
 );
 

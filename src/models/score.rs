@@ -49,6 +49,8 @@ pub struct Score {
     pub technical_competence: f64,
     pub busyness: f64,
 
+    pub llm_summary: Option<String>,
+
     /// Vector embedding for similarity search.
     #[serde(skip)]
     pub embedding: Option<Vector>,
