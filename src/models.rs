@@ -43,5 +43,5 @@ pub use reaction::{DiscordEmoji, MessageReaction};
 pub use score::{BehavioralTraits, HexacoTraits, Score};
 pub use topic::{MessageClassificationAttempt, Topic, TopicMessageRelation};
 pub use user::{DiscordAccount, VestibuleUser};
-pub use user_facts_and_activities::UserFactAndActivity;
+pub use user_facts_and_activities::{FactExtractionAttempt, UserFactAndActivity};
 pub use youtube::{YoutubeComment, YoutubeVideo};

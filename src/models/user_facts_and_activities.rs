@@ -33,3 +33,11 @@ pub struct UserFactAndActivity {
     #[serde(skip)]
     pub type_value_embedding: Option<Vector>,
 }
+
+#[derive(Debug, Clone, Model, Serialize, Deserialize)]
+#[ormlite(table = "fact_extraction_attempts")]
+pub struct FactExtractionAttempt {
+    #[ormlite(primary_key)]
+    pub message_id: i64,
+    pub attempted_at: DateTime<Utc>,
+}

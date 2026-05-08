@@ -34,12 +34,11 @@ CREATE TABLE user_facts_and_activities (
   created_at timestamptz NOT NULL DEFAULT NOW(),
 
   -- The embedding of a combination of the type and value of the fact/skill, useful to see e.g.:  Person 1 took a Junior swe position at google while person 2 interned there aswell
-  type_value_embedding vector,
-  
-  -- Enforce field presence based on record_type
-  CHECK (
-    (record_type = 'activity' AND is_current IS NULL AND level IS NULL) OR
-    (record_type = 'fact' AND started_at IS NULL AND ended_at IS NULL AND level IS NULL AND is_current IS NOT NULL) OR
-    (record_type = 'skill' AND started_at IS NULL AND ended_at IS NULL AND level IS NOT NULL AND is_current IS NOT NULL AND level IS NOT NULL)
-  )
+  type_value_embedding vector
+
+);
+
+CREATE TABLE fact_extraction_attempts (
+      message_id bigint PRIMARY KEY REFERENCES messages(message_id),
+      attempted_at timestamptz NOT NULL DEFAULT NOW()
 );
