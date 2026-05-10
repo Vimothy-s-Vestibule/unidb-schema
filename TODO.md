@@ -4,6 +4,8 @@
 
 - [ ] Centralize the job status or processing status of a message, account, basically anything into the job table or some other table in order to have to add metadata to everything like this:
 
+- [ ] FIX: Associate discord pfp media asset with discord user object via FK so we can asscoiate them for display on the dashboard
+
 ```sql
 
   -- Processing pipeline metadata
