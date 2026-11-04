@@ -59,6 +59,12 @@ The tests read `UNIDB_TEST_DATABASE_URL` (not `DATABASE_URL`, so they never pick
 up an application database) and create/drop their own databases on that server.
 Without it they fail; `UNIDB_SKIP_DB_TESTS=1` skips them explicitly.
 
+### Changing the schema of an existing database
+
+The schema files only run when the database is first created. Changes that an
+existing database needs also get an idempotent script in `migrations/`; see
+[docs/MIGRATIONS.md](docs/MIGRATIONS.md).
+
 `schema.sql` is auto-generated. Make changes in the `schema/*.sql` files and run `make rebuild` to generate it.
 
 ### Example
