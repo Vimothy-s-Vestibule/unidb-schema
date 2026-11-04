@@ -1,6 +1,6 @@
 use chrono::{DateTime, Utc};
-use serde::{Deserialize, Serialize};
 use ormlite::Model;
+use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 use super::enums::{JobStatus, JobType};
