@@ -1,0 +1,2063 @@
+{
+  "_comment": "GENERATED from schema/*.sql by tests/contract_snapshot.rs - do not edit. Regenerate: UNIDB_UPDATE_CONTRACT=1 cargo test --test contract_snapshot",
+  "enums": {
+    "activity_record_type": [
+      "activity",
+      "fact",
+      "skill",
+      "emotion"
+    ],
+    "activity_source": [
+      "llm_extraction",
+      "external_content",
+      "manual"
+    ],
+    "discord_channel_type": [
+      "text",
+      "text_thread",
+      "public_thread",
+      "forum_post",
+      "voice",
+      "forum",
+      "stage",
+      "category"
+    ],
+    "job_status": [
+      "pending",
+      "in_progress",
+      "completed",
+      "failed"
+    ],
+    "job_type": [
+      "youtube_channel_retrieval",
+      "discord_channel_sync",
+      "strava_retrieval",
+      "linkedin_scrape"
+    ],
+    "platform_access": [
+      "public",
+      "oauth_required",
+      "unavailable"
+    ],
+    "presence_status": [
+      "online",
+      "forced_online",
+      "absent",
+      "do_not_disturb",
+      "offline"
+    ],
+    "youtube_video_broadcast_status": [
+      "video",
+      "current_live",
+      "past_live",
+      "scheduled_live",
+      "none"
+    ]
+  },
+  "extensions": [
+    "vector"
+  ],
+  "format_version": 1,
+  "functions": [
+    {
+      "definition": "CREATE OR REPLACE FUNCTION public.verify_fact_has_evidence()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nBEGIN\n  IF NOT EXISTS (SELECT 1 FROM fact_and_activity_evidence WHERE fact_or_activity_id = NEW.id) THEN\n    RAISE EXCEPTION 'A fact or activity must have at least one supporting evidence record already inserted. (Fact/Activity ID: %)', NEW.id;\n  END IF;\n  RETURN NEW;\nEND;\n$function$\n",
+      "name": "verify_fact_has_evidence"
+    }
+  ],
+  "seed": {
+    "discord_accounts": [
+      {
+        "discord_user_id": 0,
+        "display_name": "Deleted User",
+        "username": "deleteduser",
+        "vestibule_user_id": "3d299903-2abf-4930-b2b9-8b083c1d21b2"
+      }
+    ],
+    "social_platforms": [
+      {
+        "access_type": "public",
+        "homepage": "https://github.com",
+        "id": "b04e255d-9798-5546-b8a1-610877262df9",
+        "logo": null,
+        "platform_name": "GitHub"
+      },
+      {
+        "access_type": "unavailable",
+        "homepage": "https://linkedin.com",
+        "id": "a27177ef-c06c-55b6-8ed3-18e975683b0d",
+        "logo": null,
+        "platform_name": "LinkedIn"
+      },
+      {
+        "access_type": "oauth_required",
+        "homepage": "https://spotify.com",
+        "id": "3ae8decc-dc79-5109-806a-0097409a95f2",
+        "logo": null,
+        "platform_name": "Spotify"
+      },
+      {
+        "access_type": "oauth_required",
+        "homepage": "https://strava.com",
+        "id": "961d567c-313f-5efc-9394-b14370bf9296",
+        "logo": null,
+        "platform_name": "Strava"
+      },
+      {
+        "access_type": "public",
+        "homepage": "https://substack.com",
+        "id": "a52d91c3-8c1f-50cf-b98a-ae034fc5d49a",
+        "logo": null,
+        "platform_name": "Substack"
+      },
+      {
+        "access_type": "public",
+        "homepage": "https://youtube.com",
+        "id": "05f4b960-1dfb-50c5-b9b2-53813526bf14",
+        "logo": null,
+        "platform_name": "YouTube"
+      }
+    ],
+    "vestibule_users": [
+      {
+        "current_diagram": null,
+        "current_diagram_last_updated": null,
+        "id": "3d299903-2abf-4930-b2b9-8b083c1d21b2",
+        "intro_diagram": null,
+        "intro_message_id": null,
+        "nickname": "Deleted User",
+        "score_id": null,
+        "score_last_updated": null
+      }
+    ]
+  },
+  "tables": {
+    "connected_accounts": {
+      "columns": [
+        {
+          "default": "gen_random_uuid()",
+          "name": "id",
+          "nullable": false,
+          "type": "uuid"
+        },
+        {
+          "default": null,
+          "name": "vestibule_user_id",
+          "nullable": false,
+          "type": "uuid"
+        },
+        {
+          "default": null,
+          "name": "platform_id",
+          "nullable": false,
+          "type": "uuid"
+        },
+        {
+          "default": null,
+          "name": "platform_user_id",
+          "nullable": true,
+          "type": "text"
+        },
+        {
+          "default": null,
+          "name": "platform_display_name",
+          "nullable": false,
+          "type": "text"
+        },
+        {
+          "default": null,
+          "name": "platform_username",
+          "nullable": false,
+          "type": "text"
+        },
+        {
+          "default": null,
+          "name": "bio",
+          "nullable": true,
+          "type": "text"
+        },
+        {
+          "default": null,
+          "name": "bio_additional_info",
+          "nullable": true,
+          "type": "text"
+        },
+        {
+          "default": null,
+          "name": "profile_picture",
+          "nullable": true,
+          "type": "uuid"
+        },
+        {
+          "default": null,
+          "name": "name_embedding",
+          "nullable": true,
+          "type": "vector"
+        },
+        {
+          "default": null,
+          "name": "mention_message_id",
+          "nullable": true,
+          "type": "bigint"
+        },
+        {
+          "default": null,
+          "name": "reasoning",
+          "nullable": false,
+          "type": "text"
+        }
+      ],
+      "constraints": [
+        {
+          "definition": "CHECK (mention_message_id IS NOT NULL OR reasoning IS NOT NULL)",
+          "kind": "check",
+          "name": "connected_accounts_check"
+        },
+        {
+          "definition": "FOREIGN KEY (mention_message_id) REFERENCES messages(message_id)",
+          "kind": "foreign_key",
+          "name": "connected_accounts_mention_message_id_fkey"
+        },
+        {
+          "definition": "FOREIGN KEY (platform_id) REFERENCES social_platforms(id)",
+          "kind": "foreign_key",
+          "name": "connected_accounts_platform_id_fkey"
+        },
+        {
+          "definition": "FOREIGN KEY (profile_picture) REFERENCES media_assets(id)",
+          "kind": "foreign_key",
+          "name": "connected_accounts_profile_picture_fkey"
+        },
+        {
+          "definition": "FOREIGN KEY (vestibule_user_id) REFERENCES vestibule_users(id) ON DELETE CASCADE",
+          "kind": "foreign_key",
+          "name": "connected_accounts_vestibule_user_id_fkey"
+        },
+        {
+          "definition": "PRIMARY KEY (id)",
+          "kind": "primary_key",
+          "name": "connected_accounts_pkey"
+        },
+        {
+          "definition": "UNIQUE (vestibule_user_id, platform_id, platform_username)",
+          "kind": "unique",
+          "name": "connected_accounts_vestibule_user_id_platform_id_platform_u_key"
+        }
+      ],
+      "indexes": [
+        {
+          "definition": "CREATE UNIQUE INDEX connected_accounts_pkey ON public.connected_accounts USING btree (id)",
+          "name": "connected_accounts_pkey"
+        },
+        {
+          "definition": "CREATE UNIQUE INDEX connected_accounts_vestibule_user_id_platform_id_platform_u_key ON public.connected_accounts USING btree (vestibule_user_id, platform_id, platform_username)",
+          "name": "connected_accounts_vestibule_user_id_platform_id_platform_u_key"
+        },
+        {
+          "definition": "CREATE INDEX idx_connected_accounts_user_id ON public.connected_accounts USING btree (vestibule_user_id)",
+          "name": "idx_connected_accounts_user_id"
+        }
+      ],
+      "triggers": []
+    },
+    "discord_accounts": {
+      "columns": [
+        {
+          "default": null,
+          "name": "discord_user_id",
+          "nullable": false,
+          "type": "bigint"
+        },
+        {
+          "default": null,
+          "name": "vestibule_user_id",
+          "nullable": false,
+          "type": "uuid"
+        },
+        {
+          "default": null,
+          "name": "username",
+          "nullable": false,
+          "type": "text"
+        },
+        {
+          "default": null,
+          "name": "display_name",
+          "nullable": false,
+          "type": "text"
+        }
+      ],
+      "constraints": [
+        {
+          "definition": "FOREIGN KEY (vestibule_user_id) REFERENCES vestibule_users(id) ON DELETE CASCADE",
+          "kind": "foreign_key",
+          "name": "discord_accounts_vestibule_user_id_fkey"
+        },
+        {
+          "definition": "PRIMARY KEY (discord_user_id)",
+          "kind": "primary_key",
+          "name": "discord_accounts_pkey"
+        }
+      ],
+      "indexes": [
+        {
+          "definition": "CREATE UNIQUE INDEX discord_accounts_pkey ON public.discord_accounts USING btree (discord_user_id)",
+          "name": "discord_accounts_pkey"
+        },
+        {
+          "definition": "CREATE INDEX idx_discord_accounts_user ON public.discord_accounts USING btree (vestibule_user_id)",
+          "name": "idx_discord_accounts_user"
+        }
+      ],
+      "triggers": []
+    },
+    "discord_channels": {
+      "columns": [
+        {
+          "default": null,
+          "name": "channel_id",
+          "nullable": false,
+          "type": "bigint"
+        },
+        {
+          "default": null,
+          "name": "name",
+          "nullable": false,
+          "type": "text"
+        },
+        {
+          "default": null,
+          "name": "channel_type",
+          "nullable": false,
+          "type": "discord_channel_type"
+        },
+        {
+          "default": null,
+          "name": "parent_channel_id",
+          "nullable": true,
+          "type": "bigint"
+        }
+      ],
+      "constraints": [
+        {
+          "definition": "FOREIGN KEY (parent_channel_id) REFERENCES discord_channels(channel_id)",
+          "kind": "foreign_key",
+          "name": "discord_channels_parent_channel_id_fkey"
+        },
+        {
+          "definition": "PRIMARY KEY (channel_id)",
+          "kind": "primary_key",
+          "name": "discord_channels_pkey"
+        }
+      ],
+      "indexes": [
+        {
+          "definition": "CREATE UNIQUE INDEX discord_channels_pkey ON public.discord_channels USING btree (channel_id)",
+          "name": "discord_channels_pkey"
+        }
+      ],
+      "triggers": []
+    },
+    "discord_emojis": {
+      "columns": [
+        {
+          "default": "gen_random_uuid()",
+          "name": "id",
+          "nullable": false,
+          "type": "uuid"
+        },
+        {
+          "default": null,
+          "name": "discord_emoji_id",
+          "nullable": false,
+          "type": "text"
+        },
+        {
+          "default": null,
+          "name": "from_guild",
+          "nullable": true,
+          "type": "text"
+        },
+        {
+          "default": null,
+          "name": "emoji_display_name",
+          "nullable": true,
+          "type": "text"
+        },
+        {
+          "default": "false",
+          "name": "is_animated",
+          "nullable": false,
+          "type": "boolean"
+        },
+        {
+          "default": null,
+          "name": "emoji_url",
+          "nullable": true,
+          "type": "text"
+        },
+        {
+          "default": null,
+          "name": "asset_id",
+          "nullable": true,
+          "type": "uuid"
+        }
+      ],
+      "constraints": [
+        {
+          "definition": "FOREIGN KEY (asset_id) REFERENCES media_assets(id)",
+          "kind": "foreign_key",
+          "name": "discord_emojis_asset_id_fkey"
+        },
+        {
+          "definition": "PRIMARY KEY (id)",
+          "kind": "primary_key",
+          "name": "discord_emojis_pkey"
+        },
+        {
+          "definition": "UNIQUE (discord_emoji_id)",
+          "kind": "unique",
+          "name": "discord_emojis_discord_emoji_id_key"
+        }
+      ],
+      "indexes": [
+        {
+          "definition": "CREATE UNIQUE INDEX discord_emojis_discord_emoji_id_key ON public.discord_emojis USING btree (discord_emoji_id)",
+          "name": "discord_emojis_discord_emoji_id_key"
+        },
+        {
+          "definition": "CREATE UNIQUE INDEX discord_emojis_pkey ON public.discord_emojis USING btree (id)",
+          "name": "discord_emojis_pkey"
+        }
+      ],
+      "triggers": []
+    },
+    "discord_user_presence": {
+      "columns": [
+        {
+          "default": "gen_random_uuid()",
+          "name": "id",
+          "nullable": false,
+          "type": "uuid"
+        },
+        {
+          "default": null,
+          "name": "user_id",
+          "nullable": false,
+          "type": "bigint"
+        },
+        {
+          "default": null,
+          "name": "status",
+          "nullable": true,
+          "type": "presence_status"
+        },
+        {
+          "default": null,
+          "name": "activity_type",
+          "nullable": true,
+          "type": "text"
+        },
+        {
+          "default": null,
+          "name": "name",
+          "nullable": true,
+          "type": "text"
+        },
+        {
+          "default": null,
+          "name": "details",
+          "nullable": true,
+          "type": "text"
+        },
+        {
+          "default": null,
+          "name": "state",
+          "nullable": true,
+          "type": "text"
+        },
+        {
+          "default": null,
+          "name": "url",
+          "nullable": true,
+          "type": "text"
+        },
+        {
+          "default": "now()",
+          "name": "started_at",
+          "nullable": false,
+          "type": "timestamp with time zone"
+        },
+        {
+          "default": null,
+          "name": "ended_at",
+          "nullable": true,
+          "type": "timestamp with time zone"
+        },
+        {
+          "default": null,
+          "name": "evidence_message_id",
+          "nullable": true,
+          "type": "bigint"
+        }
+      ],
+      "constraints": [
+        {
+          "definition": "CHECK (evidence_message_id IS NULL OR status = 'forced_online'::presence_status)",
+          "kind": "check",
+          "name": "discord_user_presence_check"
+        },
+        {
+          "definition": "CHECK (ended_at IS NULL OR ended_at > started_at)",
+          "kind": "check",
+          "name": "valid_presence_range"
+        },
+        {
+          "definition": "FOREIGN KEY (evidence_message_id) REFERENCES messages(message_id) ON DELETE CASCADE",
+          "kind": "foreign_key",
+          "name": "discord_user_presence_evidence_message_id_fkey"
+        },
+        {
+          "definition": "FOREIGN KEY (user_id) REFERENCES discord_accounts(discord_user_id) ON DELETE CASCADE",
+          "kind": "foreign_key",
+          "name": "discord_user_presence_user_id_fkey"
+        },
+        {
+          "definition": "PRIMARY KEY (id)",
+          "kind": "primary_key",
+          "name": "discord_user_presence_pkey"
+        }
+      ],
+      "indexes": [
+        {
+          "definition": "CREATE UNIQUE INDEX discord_user_presence_pkey ON public.discord_user_presence USING btree (id)",
+          "name": "discord_user_presence_pkey"
+        },
+        {
+          "definition": "CREATE INDEX idx_presence_current_activity ON public.discord_user_presence USING btree (user_id) WHERE ((ended_at IS NULL) AND (activity_type IS NOT NULL))",
+          "name": "idx_presence_current_activity"
+        },
+        {
+          "definition": "CREATE INDEX idx_presence_current_status ON public.discord_user_presence USING btree (user_id) WHERE ((ended_at IS NULL) AND (status IS NOT NULL))",
+          "name": "idx_presence_current_status"
+        },
+        {
+          "definition": "CREATE INDEX idx_presence_history ON public.discord_user_presence USING btree (user_id, started_at, ended_at)",
+          "name": "idx_presence_history"
+        },
+        {
+          "definition": "CREATE INDEX idx_presence_time ON public.discord_user_presence USING btree (started_at DESC)",
+          "name": "idx_presence_time"
+        }
+      ],
+      "triggers": []
+    },
+    "external_content": {
+      "columns": [
+        {
+          "default": "gen_random_uuid()",
+          "name": "id",
+          "nullable": false,
+          "type": "uuid"
+        },
+        {
+          "default": null,
+          "name": "account_id",
+          "nullable": false,
+          "type": "uuid"
+        },
+        {
+          "default": null,
+          "name": "content_type",
+          "nullable": false,
+          "type": "text"
+        },
+        {
+          "default": null,
+          "name": "raw_data",
+          "nullable": false,
+          "type": "jsonb"
+        },
+        {
+          "default": null,
+          "name": "content_hash",
+          "nullable": true,
+          "type": "text"
+        },
+        {
+          "default": "now()",
+          "name": "fetched_at",
+          "nullable": false,
+          "type": "timestamp with time zone"
+        },
+        {
+          "default": null,
+          "name": "updated_at",
+          "nullable": true,
+          "type": "timestamp with time zone"
+        }
+      ],
+      "constraints": [
+        {
+          "definition": "CHECK (content_type <> ALL (ARRAY['youtube_video'::text, 'youtube_comment'::text, 'youtube_channel'::text]))",
+          "kind": "check",
+          "name": "external_content_content_type_check"
+        },
+        {
+          "definition": "FOREIGN KEY (account_id) REFERENCES connected_accounts(id) ON DELETE CASCADE",
+          "kind": "foreign_key",
+          "name": "external_content_account_id_fkey"
+        },
+        {
+          "definition": "PRIMARY KEY (id)",
+          "kind": "primary_key",
+          "name": "external_content_pkey"
+        },
+        {
+          "definition": "UNIQUE (account_id, content_hash)",
+          "kind": "unique",
+          "name": "external_content_account_id_content_hash_key"
+        }
+      ],
+      "indexes": [
+        {
+          "definition": "CREATE UNIQUE INDEX external_content_account_id_content_hash_key ON public.external_content USING btree (account_id, content_hash)",
+          "name": "external_content_account_id_content_hash_key"
+        },
+        {
+          "definition": "CREATE UNIQUE INDEX external_content_pkey ON public.external_content USING btree (id)",
+          "name": "external_content_pkey"
+        }
+      ],
+      "triggers": []
+    },
+    "fact_and_activity_evidence": {
+      "columns": [
+        {
+          "default": "gen_random_uuid()",
+          "name": "id",
+          "nullable": false,
+          "type": "uuid"
+        },
+        {
+          "default": null,
+          "name": "fact_or_activity_id",
+          "nullable": false,
+          "type": "uuid"
+        },
+        {
+          "default": null,
+          "name": "message_id",
+          "nullable": true,
+          "type": "bigint"
+        },
+        {
+          "default": null,
+          "name": "youtube_comment_id",
+          "nullable": true,
+          "type": "text"
+        },
+        {
+          "default": null,
+          "name": "external_content_id",
+          "nullable": true,
+          "type": "uuid"
+        },
+        {
+          "default": null,
+          "name": "discord_presence_id",
+          "nullable": true,
+          "type": "uuid"
+        },
+        {
+          "default": "1.0",
+          "name": "weight",
+          "nullable": false,
+          "type": "real"
+        },
+        {
+          "default": null,
+          "name": "reasoning",
+          "nullable": false,
+          "type": "text"
+        }
+      ],
+      "constraints": [
+        {
+          "definition": "CHECK (weight >= 0::double precision AND weight <= 1::double precision)",
+          "kind": "check",
+          "name": "fact_and_activity_evidence_weight_range"
+        },
+        {
+          "definition": "CHECK (((message_id IS NOT NULL)::integer + (youtube_comment_id IS NOT NULL)::integer + (external_content_id IS NOT NULL)::integer + (discord_presence_id IS NOT NULL)::integer) = 1)",
+          "kind": "check",
+          "name": "has_single_evidence_source"
+        },
+        {
+          "definition": "FOREIGN KEY (discord_presence_id) REFERENCES discord_user_presence(id) ON DELETE CASCADE",
+          "kind": "foreign_key",
+          "name": "fact_and_activity_evidence_discord_presence_id_fkey"
+        },
+        {
+          "definition": "FOREIGN KEY (external_content_id) REFERENCES external_content(id) ON DELETE CASCADE",
+          "kind": "foreign_key",
+          "name": "fact_and_activity_evidence_external_content_id_fkey"
+        },
+        {
+          "definition": "FOREIGN KEY (fact_or_activity_id) REFERENCES user_facts_and_activities(id) ON DELETE CASCADE",
+          "kind": "foreign_key",
+          "name": "fact_and_activity_evidence_fact_or_activity_id_fkey"
+        },
+        {
+          "definition": "FOREIGN KEY (message_id) REFERENCES messages(message_id) ON DELETE CASCADE",
+          "kind": "foreign_key",
+          "name": "fact_and_activity_evidence_message_id_fkey"
+        },
+        {
+          "definition": "FOREIGN KEY (youtube_comment_id) REFERENCES youtube_comments(comment_id) ON DELETE CASCADE",
+          "kind": "foreign_key",
+          "name": "fact_and_activity_evidence_youtube_comment_id_fkey"
+        },
+        {
+          "definition": "PRIMARY KEY (id)",
+          "kind": "primary_key",
+          "name": "fact_and_activity_evidence_pkey"
+        },
+        {
+          "definition": "UNIQUE NULLS NOT DISTINCT (fact_or_activity_id, message_id, youtube_comment_id, external_content_id, discord_presence_id)",
+          "kind": "unique",
+          "name": "fact_and_activity_evidence_fact_or_activity_id_message_id_y_key"
+        }
+      ],
+      "indexes": [
+        {
+          "definition": "CREATE UNIQUE INDEX fact_and_activity_evidence_fact_or_activity_id_message_id_y_key ON public.fact_and_activity_evidence USING btree (fact_or_activity_id, message_id, youtube_comment_id, external_content_id, discord_presence_id) NULLS NOT DISTINCT",
+          "name": "fact_and_activity_evidence_fact_or_activity_id_message_id_y_key"
+        },
+        {
+          "definition": "CREATE UNIQUE INDEX fact_and_activity_evidence_pkey ON public.fact_and_activity_evidence USING btree (id)",
+          "name": "fact_and_activity_evidence_pkey"
+        }
+      ],
+      "triggers": []
+    },
+    "fact_extraction_attempts": {
+      "columns": [
+        {
+          "default": null,
+          "name": "message_id",
+          "nullable": false,
+          "type": "bigint"
+        },
+        {
+          "default": "now()",
+          "name": "attempted_at",
+          "nullable": false,
+          "type": "timestamp with time zone"
+        }
+      ],
+      "constraints": [
+        {
+          "definition": "FOREIGN KEY (message_id) REFERENCES messages(message_id)",
+          "kind": "foreign_key",
+          "name": "fact_extraction_attempts_message_id_fkey"
+        },
+        {
+          "definition": "PRIMARY KEY (message_id)",
+          "kind": "primary_key",
+          "name": "fact_extraction_attempts_pkey"
+        }
+      ],
+      "indexes": [
+        {
+          "definition": "CREATE UNIQUE INDEX fact_extraction_attempts_pkey ON public.fact_extraction_attempts USING btree (message_id)",
+          "name": "fact_extraction_attempts_pkey"
+        }
+      ],
+      "triggers": []
+    },
+    "jobs": {
+      "columns": [
+        {
+          "default": "gen_random_uuid()",
+          "name": "id",
+          "nullable": false,
+          "type": "uuid"
+        },
+        {
+          "default": null,
+          "name": "job_type",
+          "nullable": false,
+          "type": "job_type"
+        },
+        {
+          "default": "'pending'::job_status",
+          "name": "status",
+          "nullable": false,
+          "type": "job_status"
+        },
+        {
+          "default": null,
+          "name": "locked_by_worker_id",
+          "nullable": true,
+          "type": "text"
+        },
+        {
+          "default": null,
+          "name": "locked_at",
+          "nullable": true,
+          "type": "timestamp with time zone"
+        },
+        {
+          "default": "now()",
+          "name": "scheduled_for",
+          "nullable": false,
+          "type": "timestamp with time zone"
+        },
+        {
+          "default": "0",
+          "name": "attempts",
+          "nullable": false,
+          "type": "integer"
+        },
+        {
+          "default": "3",
+          "name": "max_attempts",
+          "nullable": false,
+          "type": "integer"
+        },
+        {
+          "default": null,
+          "name": "last_error",
+          "nullable": true,
+          "type": "text"
+        },
+        {
+          "default": null,
+          "name": "youtube_video_id",
+          "nullable": true,
+          "type": "text"
+        },
+        {
+          "default": null,
+          "name": "discord_channel_id",
+          "nullable": true,
+          "type": "bigint"
+        },
+        {
+          "default": null,
+          "name": "connected_account_id",
+          "nullable": true,
+          "type": "uuid"
+        },
+        {
+          "default": null,
+          "name": "media_asset_id",
+          "nullable": true,
+          "type": "uuid"
+        }
+      ],
+      "constraints": [
+        {
+          "definition": "CHECK (((youtube_video_id IS NOT NULL)::integer + (discord_channel_id IS NOT NULL)::integer + (connected_account_id IS NOT NULL)::integer + (media_asset_id IS NOT NULL)::integer) = 1)",
+          "kind": "check",
+          "name": "has_single_target"
+        },
+        {
+          "definition": "FOREIGN KEY (connected_account_id) REFERENCES connected_accounts(id) ON DELETE CASCADE",
+          "kind": "foreign_key",
+          "name": "jobs_connected_account_id_fkey"
+        },
+        {
+          "definition": "FOREIGN KEY (discord_channel_id) REFERENCES discord_channels(channel_id) ON DELETE CASCADE",
+          "kind": "foreign_key",
+          "name": "jobs_discord_channel_id_fkey"
+        },
+        {
+          "definition": "FOREIGN KEY (media_asset_id) REFERENCES media_assets(id) ON DELETE CASCADE",
+          "kind": "foreign_key",
+          "name": "jobs_media_asset_id_fkey"
+        },
+        {
+          "definition": "FOREIGN KEY (youtube_video_id) REFERENCES youtube_videos(video_id) ON DELETE CASCADE",
+          "kind": "foreign_key",
+          "name": "jobs_youtube_video_id_fkey"
+        },
+        {
+          "definition": "PRIMARY KEY (id)",
+          "kind": "primary_key",
+          "name": "jobs_pkey"
+        }
+      ],
+      "indexes": [
+        {
+          "definition": "CREATE UNIQUE INDEX jobs_pkey ON public.jobs USING btree (id)",
+          "name": "jobs_pkey"
+        }
+      ],
+      "triggers": []
+    },
+    "media_assets": {
+      "columns": [
+        {
+          "default": "gen_random_uuid()",
+          "name": "id",
+          "nullable": false,
+          "type": "uuid"
+        },
+        {
+          "default": null,
+          "name": "content_type",
+          "nullable": false,
+          "type": "text"
+        },
+        {
+          "default": null,
+          "name": "object_key",
+          "nullable": false,
+          "type": "text"
+        },
+        {
+          "default": null,
+          "name": "size_bytes",
+          "nullable": true,
+          "type": "bigint"
+        },
+        {
+          "default": null,
+          "name": "content_hash",
+          "nullable": true,
+          "type": "text"
+        },
+        {
+          "default": null,
+          "name": "embedding",
+          "nullable": true,
+          "type": "vector"
+        }
+      ],
+      "constraints": [
+        {
+          "definition": "PRIMARY KEY (id)",
+          "kind": "primary_key",
+          "name": "media_assets_pkey"
+        },
+        {
+          "definition": "UNIQUE (content_hash)",
+          "kind": "unique",
+          "name": "media_assets_content_hash_key"
+        },
+        {
+          "definition": "UNIQUE (object_key)",
+          "kind": "unique",
+          "name": "media_assets_object_key_key"
+        }
+      ],
+      "indexes": [
+        {
+          "definition": "CREATE UNIQUE INDEX media_assets_content_hash_key ON public.media_assets USING btree (content_hash)",
+          "name": "media_assets_content_hash_key"
+        },
+        {
+          "definition": "CREATE UNIQUE INDEX media_assets_object_key_key ON public.media_assets USING btree (object_key)",
+          "name": "media_assets_object_key_key"
+        },
+        {
+          "definition": "CREATE UNIQUE INDEX media_assets_pkey ON public.media_assets USING btree (id)",
+          "name": "media_assets_pkey"
+        }
+      ],
+      "triggers": []
+    },
+    "message_attachments": {
+      "columns": [
+        {
+          "default": "gen_random_uuid()",
+          "name": "id",
+          "nullable": false,
+          "type": "uuid"
+        },
+        {
+          "default": null,
+          "name": "message_id",
+          "nullable": false,
+          "type": "bigint"
+        },
+        {
+          "default": null,
+          "name": "asset_id",
+          "nullable": false,
+          "type": "uuid"
+        },
+        {
+          "default": "now()",
+          "name": "added_at",
+          "nullable": false,
+          "type": "timestamp with time zone"
+        },
+        {
+          "default": null,
+          "name": "deleted_at",
+          "nullable": true,
+          "type": "timestamp with time zone"
+        }
+      ],
+      "constraints": [
+        {
+          "definition": "FOREIGN KEY (asset_id) REFERENCES media_assets(id) ON DELETE RESTRICT",
+          "kind": "foreign_key",
+          "name": "message_attachments_asset_id_fkey"
+        },
+        {
+          "definition": "FOREIGN KEY (message_id) REFERENCES messages(message_id) ON DELETE CASCADE",
+          "kind": "foreign_key",
+          "name": "message_attachments_message_id_fkey"
+        },
+        {
+          "definition": "PRIMARY KEY (id)",
+          "kind": "primary_key",
+          "name": "message_attachments_pkey"
+        }
+      ],
+      "indexes": [
+        {
+          "definition": "CREATE INDEX idx_message_attachments_active ON public.message_attachments USING btree (message_id) WHERE (deleted_at IS NULL)",
+          "name": "idx_message_attachments_active"
+        },
+        {
+          "definition": "CREATE INDEX idx_message_attachments_asset_id ON public.message_attachments USING btree (asset_id)",
+          "name": "idx_message_attachments_asset_id"
+        },
+        {
+          "definition": "CREATE UNIQUE INDEX message_attachments_pkey ON public.message_attachments USING btree (id)",
+          "name": "message_attachments_pkey"
+        }
+      ],
+      "triggers": []
+    },
+    "message_classification_attempts": {
+      "columns": [
+        {
+          "default": null,
+          "name": "message_id",
+          "nullable": false,
+          "type": "bigint"
+        },
+        {
+          "default": "now()",
+          "name": "attempted_at",
+          "nullable": false,
+          "type": "timestamp with time zone"
+        }
+      ],
+      "constraints": [
+        {
+          "definition": "FOREIGN KEY (message_id) REFERENCES messages(message_id)",
+          "kind": "foreign_key",
+          "name": "message_classification_attempts_message_id_fkey"
+        },
+        {
+          "definition": "PRIMARY KEY (message_id)",
+          "kind": "primary_key",
+          "name": "message_classification_attempts_pkey"
+        }
+      ],
+      "indexes": [
+        {
+          "definition": "CREATE UNIQUE INDEX message_classification_attempts_pkey ON public.message_classification_attempts USING btree (message_id)",
+          "name": "message_classification_attempts_pkey"
+        }
+      ],
+      "triggers": []
+    },
+    "message_edits": {
+      "columns": [
+        {
+          "default": "gen_random_uuid()",
+          "name": "id",
+          "nullable": false,
+          "type": "uuid"
+        },
+        {
+          "default": null,
+          "name": "message_id",
+          "nullable": false,
+          "type": "bigint"
+        },
+        {
+          "default": null,
+          "name": "old_content",
+          "nullable": false,
+          "type": "text"
+        },
+        {
+          "default": "now()",
+          "name": "edited_at",
+          "nullable": false,
+          "type": "timestamp with time zone"
+        }
+      ],
+      "constraints": [
+        {
+          "definition": "FOREIGN KEY (message_id) REFERENCES messages(message_id) ON DELETE CASCADE",
+          "kind": "foreign_key",
+          "name": "message_edits_message_id_fkey"
+        },
+        {
+          "definition": "PRIMARY KEY (id)",
+          "kind": "primary_key",
+          "name": "message_edits_pkey"
+        }
+      ],
+      "indexes": [
+        {
+          "definition": "CREATE INDEX idx_message_edits_message_id ON public.message_edits USING btree (message_id, edited_at)",
+          "name": "idx_message_edits_message_id"
+        },
+        {
+          "definition": "CREATE UNIQUE INDEX message_edits_pkey ON public.message_edits USING btree (id)",
+          "name": "message_edits_pkey"
+        }
+      ],
+      "triggers": []
+    },
+    "message_reactions": {
+      "columns": [
+        {
+          "default": "gen_random_uuid()",
+          "name": "id",
+          "nullable": false,
+          "type": "uuid"
+        },
+        {
+          "default": null,
+          "name": "message_id",
+          "nullable": false,
+          "type": "bigint"
+        },
+        {
+          "default": null,
+          "name": "user_id",
+          "nullable": false,
+          "type": "bigint"
+        },
+        {
+          "default": null,
+          "name": "emoji_id",
+          "nullable": true,
+          "type": "uuid"
+        },
+        {
+          "default": "now()",
+          "name": "reacted_at",
+          "nullable": false,
+          "type": "timestamp with time zone"
+        }
+      ],
+      "constraints": [
+        {
+          "definition": "FOREIGN KEY (emoji_id) REFERENCES discord_emojis(id) ON DELETE RESTRICT",
+          "kind": "foreign_key",
+          "name": "message_reactions_emoji_id_fkey"
+        },
+        {
+          "definition": "FOREIGN KEY (message_id) REFERENCES messages(message_id) ON DELETE CASCADE",
+          "kind": "foreign_key",
+          "name": "message_reactions_message_id_fkey"
+        },
+        {
+          "definition": "FOREIGN KEY (user_id) REFERENCES discord_accounts(discord_user_id)",
+          "kind": "foreign_key",
+          "name": "message_reactions_user_id_fkey"
+        },
+        {
+          "definition": "PRIMARY KEY (id)",
+          "kind": "primary_key",
+          "name": "message_reactions_pkey"
+        },
+        {
+          "definition": "UNIQUE NULLS NOT DISTINCT (message_id, user_id, emoji_id)",
+          "kind": "unique",
+          "name": "message_reactions_message_id_user_id_emoji_id_key"
+        }
+      ],
+      "indexes": [
+        {
+          "definition": "CREATE INDEX idx_message_reactions_message ON public.message_reactions USING btree (message_id)",
+          "name": "idx_message_reactions_message"
+        },
+        {
+          "definition": "CREATE INDEX idx_message_reactions_user ON public.message_reactions USING btree (user_id)",
+          "name": "idx_message_reactions_user"
+        },
+        {
+          "definition": "CREATE UNIQUE INDEX message_reactions_message_id_user_id_emoji_id_key ON public.message_reactions USING btree (message_id, user_id, emoji_id) NULLS NOT DISTINCT",
+          "name": "message_reactions_message_id_user_id_emoji_id_key"
+        },
+        {
+          "definition": "CREATE UNIQUE INDEX message_reactions_pkey ON public.message_reactions USING btree (id)",
+          "name": "message_reactions_pkey"
+        }
+      ],
+      "triggers": []
+    },
+    "messages": {
+      "columns": [
+        {
+          "default": null,
+          "name": "message_id",
+          "nullable": false,
+          "type": "bigint"
+        },
+        {
+          "default": null,
+          "name": "channel_id",
+          "nullable": false,
+          "type": "bigint"
+        },
+        {
+          "default": null,
+          "name": "sent_by",
+          "nullable": false,
+          "type": "bigint"
+        },
+        {
+          "default": null,
+          "name": "content",
+          "nullable": false,
+          "type": "text"
+        },
+        {
+          "default": null,
+          "name": "sent_at",
+          "nullable": false,
+          "type": "timestamp with time zone"
+        },
+        {
+          "default": "now()",
+          "name": "added_at",
+          "nullable": false,
+          "type": "timestamp with time zone"
+        },
+        {
+          "default": null,
+          "name": "last_edited",
+          "nullable": true,
+          "type": "timestamp with time zone"
+        },
+        {
+          "default": null,
+          "name": "deleted_at",
+          "nullable": true,
+          "type": "timestamp with time zone"
+        },
+        {
+          "default": null,
+          "name": "in_reply_to",
+          "nullable": true,
+          "type": "bigint"
+        }
+      ],
+      "constraints": [
+        {
+          "definition": "FOREIGN KEY (sent_by) REFERENCES discord_accounts(discord_user_id)",
+          "kind": "foreign_key",
+          "name": "fk_messages_sent_by"
+        },
+        {
+          "definition": "FOREIGN KEY (channel_id) REFERENCES discord_channels(channel_id)",
+          "kind": "foreign_key",
+          "name": "messages_channel_id_fkey"
+        },
+        {
+          "definition": "FOREIGN KEY (in_reply_to) REFERENCES messages(message_id)",
+          "kind": "foreign_key",
+          "name": "messages_in_reply_to_fkey"
+        },
+        {
+          "definition": "PRIMARY KEY (message_id)",
+          "kind": "primary_key",
+          "name": "messages_pkey"
+        }
+      ],
+      "indexes": [
+        {
+          "definition": "CREATE INDEX idx_messages_active ON public.messages USING btree (channel_id, sent_at DESC) WHERE (deleted_at IS NULL)",
+          "name": "idx_messages_active"
+        },
+        {
+          "definition": "CREATE INDEX idx_messages_channel_id ON public.messages USING btree (channel_id)",
+          "name": "idx_messages_channel_id"
+        },
+        {
+          "definition": "CREATE INDEX idx_messages_channel_sent ON public.messages USING btree (channel_id, sent_at DESC)",
+          "name": "idx_messages_channel_sent"
+        },
+        {
+          "definition": "CREATE INDEX idx_messages_in_reply_to ON public.messages USING btree (in_reply_to) WHERE (in_reply_to IS NOT NULL)",
+          "name": "idx_messages_in_reply_to"
+        },
+        {
+          "definition": "CREATE INDEX idx_messages_sent_at ON public.messages USING btree (sent_at DESC)",
+          "name": "idx_messages_sent_at"
+        },
+        {
+          "definition": "CREATE INDEX idx_messages_sent_by ON public.messages USING btree (sent_by)",
+          "name": "idx_messages_sent_by"
+        },
+        {
+          "definition": "CREATE INDEX idx_messages_user_sent ON public.messages USING btree (sent_by, sent_at DESC)",
+          "name": "idx_messages_user_sent"
+        },
+        {
+          "definition": "CREATE UNIQUE INDEX messages_pkey ON public.messages USING btree (message_id)",
+          "name": "messages_pkey"
+        }
+      ],
+      "triggers": []
+    },
+    "scores": {
+      "columns": [
+        {
+          "default": "gen_random_uuid()",
+          "name": "id",
+          "nullable": false,
+          "type": "uuid"
+        },
+        {
+          "default": null,
+          "name": "honesty",
+          "nullable": false,
+          "type": "double precision"
+        },
+        {
+          "default": null,
+          "name": "emotionality",
+          "nullable": false,
+          "type": "double precision"
+        },
+        {
+          "default": null,
+          "name": "extraversion",
+          "nullable": false,
+          "type": "double precision"
+        },
+        {
+          "default": null,
+          "name": "agreeableness",
+          "nullable": false,
+          "type": "double precision"
+        },
+        {
+          "default": null,
+          "name": "conscientiousness",
+          "nullable": false,
+          "type": "double precision"
+        },
+        {
+          "default": null,
+          "name": "openness_to_experience",
+          "nullable": false,
+          "type": "double precision"
+        },
+        {
+          "default": null,
+          "name": "agency",
+          "nullable": false,
+          "type": "double precision"
+        },
+        {
+          "default": null,
+          "name": "achievement",
+          "nullable": false,
+          "type": "double precision"
+        },
+        {
+          "default": null,
+          "name": "influence",
+          "nullable": false,
+          "type": "double precision"
+        },
+        {
+          "default": null,
+          "name": "sarcasm",
+          "nullable": false,
+          "type": "double precision"
+        },
+        {
+          "default": null,
+          "name": "security",
+          "nullable": false,
+          "type": "double precision"
+        },
+        {
+          "default": null,
+          "name": "self_reflection",
+          "nullable": false,
+          "type": "double precision"
+        },
+        {
+          "default": null,
+          "name": "technical_competence",
+          "nullable": false,
+          "type": "double precision"
+        },
+        {
+          "default": null,
+          "name": "busyness",
+          "nullable": false,
+          "type": "double precision"
+        },
+        {
+          "default": null,
+          "name": "llm_summary",
+          "nullable": true,
+          "type": "text"
+        },
+        {
+          "default": null,
+          "name": "embedding",
+          "nullable": true,
+          "type": "vector"
+        }
+      ],
+      "constraints": [
+        {
+          "definition": "CHECK (honesty >= 0::double precision AND honesty <= 1::double precision AND emotionality >= 0::double precision AND emotionality <= 1::double precision AND extraversion >= 0::double precision AND extraversion <= 1::double precision AND agreeableness >= 0::double precision AND agreeableness <= 1::double precision AND conscientiousness >= 0::double precision AND conscientiousness <= 1::double precision AND openness_to_experience >= 0::double precision AND openness_to_experience <= 1::double precision AND agency >= 0::double precision AND agency <= 1::double precision AND achievement >= 0::double precision AND achievement <= 1::double precision AND influence >= 0::double precision AND influence <= 1::double precision AND sarcasm >= 0::double precision AND sarcasm <= 1::double precision AND security >= 0::double precision AND security <= 1::double precision AND self_reflection >= 0::double precision AND self_reflection <= 1::double precision AND technical_competence >= 0::double precision AND technical_competence <= 1::double precision AND busyness >= 0::double precision AND busyness <= 1::double precision)",
+          "kind": "check",
+          "name": "scores_values_in_unit_range"
+        },
+        {
+          "definition": "PRIMARY KEY (id)",
+          "kind": "primary_key",
+          "name": "scores_pkey"
+        }
+      ],
+      "indexes": [
+        {
+          "definition": "CREATE UNIQUE INDEX scores_pkey ON public.scores USING btree (id)",
+          "name": "scores_pkey"
+        }
+      ],
+      "triggers": []
+    },
+    "social_platforms": {
+      "columns": [
+        {
+          "default": null,
+          "name": "id",
+          "nullable": false,
+          "type": "uuid"
+        },
+        {
+          "default": null,
+          "name": "platform_name",
+          "nullable": false,
+          "type": "text"
+        },
+        {
+          "default": null,
+          "name": "homepage",
+          "nullable": false,
+          "type": "text"
+        },
+        {
+          "default": null,
+          "name": "access_type",
+          "nullable": false,
+          "type": "platform_access"
+        },
+        {
+          "default": null,
+          "name": "logo",
+          "nullable": true,
+          "type": "uuid"
+        }
+      ],
+      "constraints": [
+        {
+          "definition": "FOREIGN KEY (logo) REFERENCES media_assets(id)",
+          "kind": "foreign_key",
+          "name": "social_platforms_logo_fkey"
+        },
+        {
+          "definition": "PRIMARY KEY (id)",
+          "kind": "primary_key",
+          "name": "social_platforms_pkey"
+        },
+        {
+          "definition": "UNIQUE (platform_name)",
+          "kind": "unique",
+          "name": "social_platforms_platform_name_key"
+        }
+      ],
+      "indexes": [
+        {
+          "definition": "CREATE UNIQUE INDEX social_platforms_pkey ON public.social_platforms USING btree (id)",
+          "name": "social_platforms_pkey"
+        },
+        {
+          "definition": "CREATE UNIQUE INDEX social_platforms_platform_name_key ON public.social_platforms USING btree (platform_name)",
+          "name": "social_platforms_platform_name_key"
+        }
+      ],
+      "triggers": []
+    },
+    "topic": {
+      "columns": [
+        {
+          "default": "gen_random_uuid()",
+          "name": "id",
+          "nullable": false,
+          "type": "uuid"
+        },
+        {
+          "default": null,
+          "name": "name",
+          "nullable": false,
+          "type": "text"
+        },
+        {
+          "default": null,
+          "name": "embedding",
+          "nullable": true,
+          "type": "vector"
+        }
+      ],
+      "constraints": [
+        {
+          "definition": "PRIMARY KEY (id)",
+          "kind": "primary_key",
+          "name": "topic_pkey"
+        },
+        {
+          "definition": "UNIQUE (name)",
+          "kind": "unique",
+          "name": "topic_name_key"
+        }
+      ],
+      "indexes": [
+        {
+          "definition": "CREATE UNIQUE INDEX topic_name_key ON public.topic USING btree (name)",
+          "name": "topic_name_key"
+        },
+        {
+          "definition": "CREATE UNIQUE INDEX topic_pkey ON public.topic USING btree (id)",
+          "name": "topic_pkey"
+        }
+      ],
+      "triggers": []
+    },
+    "topic_message_relation": {
+      "columns": [
+        {
+          "default": "gen_random_uuid()",
+          "name": "id",
+          "nullable": false,
+          "type": "uuid"
+        },
+        {
+          "default": null,
+          "name": "topic_id",
+          "nullable": false,
+          "type": "uuid"
+        },
+        {
+          "default": null,
+          "name": "message_id",
+          "nullable": false,
+          "type": "bigint"
+        }
+      ],
+      "constraints": [
+        {
+          "definition": "FOREIGN KEY (message_id) REFERENCES messages(message_id)",
+          "kind": "foreign_key",
+          "name": "topic_message_relation_message_id_fkey"
+        },
+        {
+          "definition": "FOREIGN KEY (topic_id) REFERENCES topic(id)",
+          "kind": "foreign_key",
+          "name": "topic_message_relation_topic_id_fkey"
+        },
+        {
+          "definition": "PRIMARY KEY (id)",
+          "kind": "primary_key",
+          "name": "topic_message_relation_pkey"
+        },
+        {
+          "definition": "UNIQUE (message_id)",
+          "kind": "unique",
+          "name": "topic_message_relation_message_id_key"
+        }
+      ],
+      "indexes": [
+        {
+          "definition": "CREATE UNIQUE INDEX topic_message_relation_message_id_key ON public.topic_message_relation USING btree (message_id)",
+          "name": "topic_message_relation_message_id_key"
+        },
+        {
+          "definition": "CREATE UNIQUE INDEX topic_message_relation_pkey ON public.topic_message_relation USING btree (id)",
+          "name": "topic_message_relation_pkey"
+        }
+      ],
+      "triggers": []
+    },
+    "user_facts_and_activities": {
+      "columns": [
+        {
+          "default": "gen_random_uuid()",
+          "name": "id",
+          "nullable": false,
+          "type": "uuid"
+        },
+        {
+          "default": null,
+          "name": "user_id",
+          "nullable": false,
+          "type": "uuid"
+        },
+        {
+          "default": null,
+          "name": "record_type",
+          "nullable": false,
+          "type": "activity_record_type"
+        },
+        {
+          "default": null,
+          "name": "source",
+          "nullable": false,
+          "type": "activity_source"
+        },
+        {
+          "default": null,
+          "name": "score_id",
+          "nullable": true,
+          "type": "uuid"
+        },
+        {
+          "default": null,
+          "name": "type",
+          "nullable": false,
+          "type": "text"
+        },
+        {
+          "default": null,
+          "name": "value",
+          "nullable": false,
+          "type": "text"
+        },
+        {
+          "default": "1.0",
+          "name": "confidence",
+          "nullable": false,
+          "type": "real"
+        },
+        {
+          "default": null,
+          "name": "level",
+          "nullable": true,
+          "type": "smallint"
+        },
+        {
+          "default": null,
+          "name": "started_at",
+          "nullable": true,
+          "type": "timestamp with time zone"
+        },
+        {
+          "default": null,
+          "name": "ended_at",
+          "nullable": true,
+          "type": "timestamp with time zone"
+        },
+        {
+          "default": "true",
+          "name": "is_current",
+          "nullable": true,
+          "type": "boolean"
+        },
+        {
+          "default": "now()",
+          "name": "created_at",
+          "nullable": false,
+          "type": "timestamp with time zone"
+        },
+        {
+          "default": null,
+          "name": "type_value_embedding",
+          "nullable": true,
+          "type": "vector"
+        }
+      ],
+      "constraints": [
+        {
+          "definition": "CHECK (confidence >= 0::double precision AND confidence <= 1::double precision)",
+          "kind": "check",
+          "name": "user_facts_and_activities_confidence_range"
+        },
+        {
+          "definition": "CHECK (level >= 0 AND level <= 10)",
+          "kind": "check",
+          "name": "user_facts_and_activities_level_check"
+        },
+        {
+          "definition": "FOREIGN KEY (score_id) REFERENCES scores(id)",
+          "kind": "foreign_key",
+          "name": "user_facts_and_activities_score_id_fkey"
+        },
+        {
+          "definition": "FOREIGN KEY (user_id) REFERENCES vestibule_users(id) ON DELETE CASCADE",
+          "kind": "foreign_key",
+          "name": "user_facts_and_activities_user_id_fkey"
+        },
+        {
+          "definition": "PRIMARY KEY (id)",
+          "kind": "primary_key",
+          "name": "user_facts_and_activities_pkey"
+        },
+        {
+          "definition": "TRIGGER DEFERRABLE INITIALLY DEFERRED",
+          "kind": "t",
+          "name": "ensure_fact_has_evidence"
+        }
+      ],
+      "indexes": [
+        {
+          "definition": "CREATE INDEX idx_user_facts_and_activities_current ON public.user_facts_and_activities USING btree (user_id, is_current) WHERE (record_type = 'fact'::activity_record_type)",
+          "name": "idx_user_facts_and_activities_current"
+        },
+        {
+          "definition": "CREATE INDEX idx_user_facts_and_activities_started ON public.user_facts_and_activities USING btree (user_id, started_at DESC) WHERE (record_type = 'activity'::activity_record_type)",
+          "name": "idx_user_facts_and_activities_started"
+        },
+        {
+          "definition": "CREATE INDEX idx_user_facts_and_activities_type ON public.user_facts_and_activities USING btree (user_id, type)",
+          "name": "idx_user_facts_and_activities_type"
+        },
+        {
+          "definition": "CREATE INDEX idx_user_facts_and_activities_user ON public.user_facts_and_activities USING btree (user_id)",
+          "name": "idx_user_facts_and_activities_user"
+        },
+        {
+          "definition": "CREATE UNIQUE INDEX user_facts_and_activities_pkey ON public.user_facts_and_activities USING btree (id)",
+          "name": "user_facts_and_activities_pkey"
+        }
+      ],
+      "triggers": [
+        {
+          "definition": "CREATE CONSTRAINT TRIGGER ensure_fact_has_evidence AFTER INSERT ON user_facts_and_activities DEFERRABLE INITIALLY DEFERRED FOR EACH ROW EXECUTE FUNCTION verify_fact_has_evidence()",
+          "name": "ensure_fact_has_evidence"
+        }
+      ]
+    },
+    "vestibule_users": {
+      "columns": [
+        {
+          "default": "gen_random_uuid()",
+          "name": "id",
+          "nullable": false,
+          "type": "uuid"
+        },
+        {
+          "default": null,
+          "name": "nickname",
+          "nullable": true,
+          "type": "text"
+        },
+        {
+          "default": null,
+          "name": "intro_message_id",
+          "nullable": true,
+          "type": "bigint"
+        },
+        {
+          "default": null,
+          "name": "score_id",
+          "nullable": true,
+          "type": "uuid"
+        },
+        {
+          "default": null,
+          "name": "score_last_updated",
+          "nullable": true,
+          "type": "timestamp with time zone"
+        },
+        {
+          "default": null,
+          "name": "current_diagram",
+          "nullable": true,
+          "type": "bytea"
+        },
+        {
+          "default": null,
+          "name": "current_diagram_last_updated",
+          "nullable": true,
+          "type": "timestamp with time zone"
+        },
+        {
+          "default": null,
+          "name": "intro_diagram",
+          "nullable": true,
+          "type": "bytea"
+        }
+      ],
+      "constraints": [
+        {
+          "definition": "FOREIGN KEY (intro_message_id) REFERENCES messages(message_id)",
+          "kind": "foreign_key",
+          "name": "fk_vestibule_users_intro_message"
+        },
+        {
+          "definition": "FOREIGN KEY (score_id) REFERENCES scores(id)",
+          "kind": "foreign_key",
+          "name": "vestibule_users_score_id_fkey"
+        },
+        {
+          "definition": "PRIMARY KEY (id)",
+          "kind": "primary_key",
+          "name": "vestibule_users_pkey"
+        }
+      ],
+      "indexes": [
+        {
+          "definition": "CREATE UNIQUE INDEX vestibule_users_pkey ON public.vestibule_users USING btree (id)",
+          "name": "vestibule_users_pkey"
+        }
+      ],
+      "triggers": []
+    },
+    "youtube_comments": {
+      "columns": [
+        {
+          "default": null,
+          "name": "comment_id",
+          "nullable": false,
+          "type": "text"
+        },
+        {
+          "default": null,
+          "name": "video_id",
+          "nullable": false,
+          "type": "text"
+        },
+        {
+          "default": null,
+          "name": "author_raw_channel_id",
+          "nullable": false,
+          "type": "text"
+        },
+        {
+          "default": null,
+          "name": "author_channel_id",
+          "nullable": true,
+          "type": "uuid"
+        },
+        {
+          "default": null,
+          "name": "content",
+          "nullable": false,
+          "type": "text"
+        },
+        {
+          "default": null,
+          "name": "like_count",
+          "nullable": false,
+          "type": "integer"
+        },
+        {
+          "default": null,
+          "name": "published_at",
+          "nullable": false,
+          "type": "timestamp with time zone"
+        },
+        {
+          "default": null,
+          "name": "edited_at",
+          "nullable": true,
+          "type": "timestamp with time zone"
+        },
+        {
+          "default": null,
+          "name": "in_reply_to",
+          "nullable": true,
+          "type": "text"
+        },
+        {
+          "default": null,
+          "name": "added_at",
+          "nullable": true,
+          "type": "timestamp with time zone"
+        }
+      ],
+      "constraints": [
+        {
+          "definition": "FOREIGN KEY (author_channel_id) REFERENCES connected_accounts(id) ON DELETE CASCADE",
+          "kind": "foreign_key",
+          "name": "youtube_comments_author_channel_id_fkey"
+        },
+        {
+          "definition": "FOREIGN KEY (in_reply_to) REFERENCES youtube_comments(comment_id)",
+          "kind": "foreign_key",
+          "name": "youtube_comments_in_reply_to_fkey"
+        },
+        {
+          "definition": "FOREIGN KEY (video_id) REFERENCES youtube_videos(video_id) ON DELETE CASCADE",
+          "kind": "foreign_key",
+          "name": "youtube_comments_video_id_fkey"
+        },
+        {
+          "definition": "PRIMARY KEY (comment_id)",
+          "kind": "primary_key",
+          "name": "youtube_comments_pkey"
+        }
+      ],
+      "indexes": [
+        {
+          "definition": "CREATE INDEX idx_youtube_comments_author ON public.youtube_comments USING btree (author_channel_id)",
+          "name": "idx_youtube_comments_author"
+        },
+        {
+          "definition": "CREATE INDEX idx_youtube_comments_published ON public.youtube_comments USING btree (published_at DESC)",
+          "name": "idx_youtube_comments_published"
+        },
+        {
+          "definition": "CREATE INDEX idx_youtube_comments_video ON public.youtube_comments USING btree (video_id)",
+          "name": "idx_youtube_comments_video"
+        },
+        {
+          "definition": "CREATE UNIQUE INDEX youtube_comments_pkey ON public.youtube_comments USING btree (comment_id)",
+          "name": "youtube_comments_pkey"
+        }
+      ],
+      "triggers": []
+    },
+    "youtube_videos": {
+      "columns": [
+        {
+          "default": null,
+          "name": "video_id",
+          "nullable": false,
+          "type": "text"
+        },
+        {
+          "default": null,
+          "name": "channel_vestibule_id",
+          "nullable": false,
+          "type": "uuid"
+        },
+        {
+          "default": null,
+          "name": "title",
+          "nullable": false,
+          "type": "text"
+        },
+        {
+          "default": null,
+          "name": "description",
+          "nullable": true,
+          "type": "text"
+        },
+        {
+          "default": null,
+          "name": "published_at",
+          "nullable": false,
+          "type": "timestamp with time zone"
+        },
+        {
+          "default": "0",
+          "name": "total_views",
+          "nullable": false,
+          "type": "bigint"
+        },
+        {
+          "default": "0",
+          "name": "total_likes",
+          "nullable": false,
+          "type": "bigint"
+        },
+        {
+          "default": "0",
+          "name": "total_comments",
+          "nullable": false,
+          "type": "bigint"
+        },
+        {
+          "default": null,
+          "name": "keyword_tags",
+          "nullable": true,
+          "type": "text[]"
+        },
+        {
+          "default": null,
+          "name": "duration_seconds",
+          "nullable": false,
+          "type": "integer"
+        },
+        {
+          "default": null,
+          "name": "broadcast_status",
+          "nullable": false,
+          "type": "youtube_video_broadcast_status"
+        },
+        {
+          "default": null,
+          "name": "thumbnail_asset_id",
+          "nullable": true,
+          "type": "uuid"
+        },
+        {
+          "default": null,
+          "name": "transcript_asset_id",
+          "nullable": true,
+          "type": "uuid"
+        },
+        {
+          "default": null,
+          "name": "audio_asset_id",
+          "nullable": true,
+          "type": "uuid"
+        },
+        {
+          "default": "now()",
+          "name": "added_at",
+          "nullable": true,
+          "type": "timestamp with time zone"
+        }
+      ],
+      "constraints": [
+        {
+          "definition": "FOREIGN KEY (audio_asset_id) REFERENCES media_assets(id)",
+          "kind": "foreign_key",
+          "name": "youtube_videos_audio_asset_id_fkey"
+        },
+        {
+          "definition": "FOREIGN KEY (channel_vestibule_id) REFERENCES connected_accounts(id) ON DELETE CASCADE",
+          "kind": "foreign_key",
+          "name": "youtube_videos_channel_vestibule_id_fkey"
+        },
+        {
+          "definition": "FOREIGN KEY (thumbnail_asset_id) REFERENCES media_assets(id)",
+          "kind": "foreign_key",
+          "name": "youtube_videos_thumbnail_asset_id_fkey"
+        },
+        {
+          "definition": "FOREIGN KEY (transcript_asset_id) REFERENCES media_assets(id)",
+          "kind": "foreign_key",
+          "name": "youtube_videos_transcript_asset_id_fkey"
+        },
+        {
+          "definition": "PRIMARY KEY (video_id)",
+          "kind": "primary_key",
+          "name": "youtube_videos_pkey"
+        }
+      ],
+      "indexes": [
+        {
+          "definition": "CREATE UNIQUE INDEX youtube_videos_pkey ON public.youtube_videos USING btree (video_id)",
+          "name": "youtube_videos_pkey"
+        }
+      ],
+      "triggers": []
+    }
+  }
+}

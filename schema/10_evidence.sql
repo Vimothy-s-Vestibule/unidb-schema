@@ -33,7 +33,8 @@ CREATE TABLE fact_and_activity_evidence (
   discord_presence_id uuid REFERENCES discord_user_presence(id) ON DELETE CASCADE,
 
   -- How strongly this evidence supports the fact or activity (0.0 - 1.0)
-  weight real NOT NULL DEFAULT 1.0,
+  weight real NOT NULL DEFAULT 1.0
+    CONSTRAINT fact_and_activity_evidence_weight_range CHECK (weight BETWEEN 0 AND 1),
   
   -- The LLM's explanation of why this specific source supports the fact/activity
   reasoning text NOT NULL,

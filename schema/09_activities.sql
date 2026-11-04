@@ -19,7 +19,8 @@ CREATE TABLE user_facts_and_activities (
   value text NOT NULL,
 
   -- Confidence that the fact is actually true or activity is accurate and was interpreted correctly by the LLM
-  confidence real NOT NULL DEFAULT 1.0,
+  confidence real NOT NULL DEFAULT 1.0
+    CONSTRAINT user_facts_and_activities_confidence_range CHECK (confidence BETWEEN 0 AND 1),
 
   -- For 'skill' only: Proficiency level (0-10)
   level smallint CHECK (level >= 0 AND level <= 10),

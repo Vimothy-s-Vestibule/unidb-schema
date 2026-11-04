@@ -7,17 +7,19 @@ CREATE TABLE social_platforms (
   logo uuid REFERENCES media_assets(id)
 );
 
--- Seed initial social platforms, more can be added anytime
+-- Seed initial social platforms, more can be added anytime.
+-- Fixed ids (UUIDv5 of the homepage in the URL namespace) so every environment
+-- agrees on them; new platforms should follow the same rule.
 INSERT INTO social_platforms (id, platform_name, homepage, access_type)
 VALUES
-  (gen_random_uuid(), 'Strava', 'https://strava.com', 'oauth_required'),
-  (gen_random_uuid(), 'Spotify', 'https://spotify.com', 'oauth_required'),
-  (gen_random_uuid(), 'LinkedIn', 'https://linkedin.com', 'unavailable'),
-  (gen_random_uuid(), 'YouTube', 'https://youtube.com', 'public'),
+  ('961d567c-313f-5efc-9394-b14370bf9296', 'Strava', 'https://strava.com', 'oauth_required'),
+  ('3ae8decc-dc79-5109-806a-0097409a95f2', 'Spotify', 'https://spotify.com', 'oauth_required'),
+  ('a27177ef-c06c-55b6-8ed3-18e975683b0d', 'LinkedIn', 'https://linkedin.com', 'unavailable'),
+  ('05f4b960-1dfb-50c5-b9b2-53813526bf14', 'YouTube', 'https://youtube.com', 'public'),
   -- TODO curl -L -X GET "https://api.github.com/users/alex" -H "Accept: application/vnd.github+json"
-  (gen_random_uuid(), 'GitHub', 'https://github.com', 'public'),
+  ('b04e255d-9798-5546-b8a1-610877262df9', 'GitHub', 'https://github.com', 'public'),
   -- TODO Use Nvidia parakeet to transscribe Sylvan's daily internal monologue and run analysis on it for maximum data extraction: https://vimothee.substack.com/feed
-  (gen_random_uuid(), 'Substack', 'https://substack.com', 'public')
+  ('a52d91c3-8c1f-50cf-b98a-ae034fc5d49a', 'Substack', 'https://substack.com', 'public')
 ON CONFLICT (platform_name) DO NOTHING;
 
 -- TODO seed db with vestibule channel, reans, big smoke, tokitsuno and all others who have their youtube connected to their discord or "watch my latest video:" in their discord bio

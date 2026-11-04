@@ -2,8 +2,8 @@
 CREATE TABLE discord_emojis (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
 
-  -- Unicode emoji string or custom emoji snowflake ID
-  discord_emoji_id text NOT NULL,
+  -- Unicode emoji string or custom emoji snowflake ID (one row per emoji; ingest looks emojis up by it)
+  discord_emoji_id text NOT NULL UNIQUE,
 
   -- Some string if the emoji is a custom one created by some server, otherwise NULL
   from_guild text,
@@ -30,6 +30,7 @@ CREATE TABLE message_reactions (
 
   reacted_at timestamptz NOT NULL DEFAULT NOW(),
 
-  -- Prevent duplicate reactions
-  UNIQUE (message_id, user_id, emoji_id)
+  -- Prevent duplicate reactions. NULLS NOT DISTINCT: reactions with an unresolvable
+  -- emoji (emoji_id NULL) must dedupe too, or every historical re-scan adds them again.
+  UNIQUE NULLS NOT DISTINCT (message_id, user_id, emoji_id)
 );
