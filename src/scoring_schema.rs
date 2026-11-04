@@ -100,7 +100,7 @@ pub fn scoring_prompt() -> String {
     let mut out = String::from(
         "# Personality & Behavioral Scoring\n\n\
          Score the message on each trait using a 0.0 to 1.0 scale.\n\
-         - Return null if there is no/insufficient evidence
+         - Every trait must be a number; if there is no or insufficient evidence, return 0.5 (neutral)\n\
          - Use values closer to extremes only with clear evidence\n\n\
          ## HEXACO Personality Traits\n\n",
     );
@@ -177,5 +177,41 @@ mod tests {
             struct_fields.difference(&schema_names).collect::<Vec<_>>(),
             schema_names.difference(&struct_fields).collect::<Vec<_>>()
         );
+    }
+
+    /// Every trait is stored in a `NOT NULL double precision` column of
+    /// `scores` and in a non-`Option` `f64` of `HexacoTraits`/`BehavioralTraits`,
+    /// so the prompt must never ask the model for `null`.
+    #[test]
+    fn prompt_never_asks_for_null() {
+        let prompt = scoring_prompt();
+        assert!(
+            !prompt.to_lowercase().contains("null"),
+            "scoring_prompt() asks for null, but scores.* are NOT NULL:\n{prompt}"
+        );
+    }
+
+    /// Lines must not carry the source file's indentation (a missing `\n\`
+    /// line continuation in the string literal).
+    #[test]
+    fn prompt_has_no_stray_indentation() {
+        for line in scoring_prompt().lines() {
+            assert!(
+                !line.starts_with("   "),
+                "unexpected indentation in prompt line {line:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn prompt_lists_every_trait_in_output_format() {
+        let prompt = scoring_prompt();
+        for t in HEXACO.iter().chain(BEHAVIORAL.iter()) {
+            assert!(
+                prompt.contains(&format!("\"{}\": <0.0-1.0>", t.name)),
+                "{} missing from output format",
+                t.name
+            );
+        }
     }
 }
