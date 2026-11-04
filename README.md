@@ -21,6 +21,8 @@ Many tables include nullable columns to store an LLM-generated evaluation or sum
 │   ├── 00_extensions.sql   
 │   ├── ...                 
 │   └── 99_indexes.sql      
+├── contract/schema.json    # Generated, machine-readable schema contract (see below)
+├── tests/                  # Schema/model contract tests (need a Postgres server)
 ├── schema.sql              # Auto-generated unified SQL schema by make
 ├── Makefile                # Run 'make' to rebuild schema.sql from all files in the schema/ directory
 └── src/
@@ -32,6 +34,30 @@ Many tables include nullable columns to store an LLM-generated evaluation or sum
 ## Contributing
 
 When creating new files in the `schema/` folder, please pay attention to their order to ensure all foreign key relationships are satisfied.
+
+### Tests and the schema contract
+
+`tests/` checks that `schema/*.sql` and the Rust models agree, against a real
+Postgres (pgvector) server:
+
+- `schema_load`: the files apply cleanly to an empty database in filename order,
+  and `cat schema/*.sql` (what the Postgres image runs) yields the same catalog.
+- `model_contract`: for every model, column names, types (int/float widths,
+  enums, `bytea`, `vector`, ...) and nullability match the table; fixture rows
+  round-trip through the model; every Rust enum has exactly the SQL enum's labels;
+  every table and SQL enum has a Rust counterpart.
+- `contract_snapshot`: `contract/schema.json` (machine-readable schema, generated
+  from the catalog) is up to date.
+
+```sh
+make test-db      # disposable pgvector container on 127.0.0.1:55433
+make test         # UNIDB_TEST_DATABASE_URL defaults to that container
+make contract     # regenerate contract/schema.json after editing schema/*.sql
+```
+
+The tests read `UNIDB_TEST_DATABASE_URL` (not `DATABASE_URL`, so they never pick
+up an application database) and create/drop their own databases on that server.
+Without it they fail; `UNIDB_SKIP_DB_TESTS=1` skips them explicitly.
 
 `schema.sql` is auto-generated. Make changes in the `schema/*.sql` files and run `make rebuild` to generate it.
 
