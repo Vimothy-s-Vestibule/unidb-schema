@@ -43,12 +43,11 @@ const SEEDED: &[(&str, &str, &[&str])] = &[
             "display_name",
         ],
     ),
-    // social_platforms.id is gen_random_uuid() at schema-load time, so it differs
-    // between environments and is not part of the contract.
+    // ids are fixed (UUIDv5 of the homepage), so they are part of the contract
     (
         "social_platforms",
         "platform_name",
-        &["platform_name", "homepage", "access_type", "logo"],
+        &["id", "platform_name", "homepage", "access_type", "logo"],
     ),
 ];
 

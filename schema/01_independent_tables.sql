@@ -24,7 +24,18 @@ CREATE TABLE scores (
   -- Nice human-readable summary of what the user likes to talk about and what their personality is like (TODO independent of the score numbers!!!!)
   llm_summary text,
 
-  embedding vector
+  embedding vector,
+
+  -- scoring_prompt() scores every trait on a 0.0..=1.0 scale (rejects NaN too)
+  CONSTRAINT scores_values_in_unit_range CHECK (
+    honesty BETWEEN 0 AND 1 AND emotionality BETWEEN 0 AND 1 AND
+    extraversion BETWEEN 0 AND 1 AND agreeableness BETWEEN 0 AND 1 AND
+    conscientiousness BETWEEN 0 AND 1 AND openness_to_experience BETWEEN 0 AND 1 AND
+    agency BETWEEN 0 AND 1 AND achievement BETWEEN 0 AND 1 AND
+    influence BETWEEN 0 AND 1 AND sarcasm BETWEEN 0 AND 1 AND
+    security BETWEEN 0 AND 1 AND self_reflection BETWEEN 0 AND 1 AND
+    technical_competence BETWEEN 0 AND 1 AND busyness BETWEEN 0 AND 1
+  )
 );
 
 CREATE TABLE discord_channels (

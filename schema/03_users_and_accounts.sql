@@ -25,7 +25,9 @@ CREATE TABLE vestibule_users (
 CREATE TABLE discord_accounts (
   discord_user_id bigint PRIMARY KEY,
   vestibule_user_id uuid NOT NULL REFERENCES vestibule_users(id) ON DELETE CASCADE,
-  username text NOT NULL UNIQUE,
+  -- NOT unique: Discord usernames are changed, released and reused, and a stored
+  -- username is never updated, so uniqueness would block new users forever.
+  username text NOT NULL,
   display_name text NOT NULL
 );
 

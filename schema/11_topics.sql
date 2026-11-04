@@ -1,7 +1,8 @@
 CREATE TABLE topic (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-    -- LLM-extracted concise summary of what the topic messages discuss
-    name text NOT NULL,
+    -- LLM-extracted concise summary of what the topic messages discuss.
+    -- Unique: topic-sorter reuses an existing topic of the same name.
+    name text NOT NULL UNIQUE,
     embedding vector
 );
 
@@ -9,7 +10,9 @@ CREATE TABLE topic (
 CREATE TABLE topic_message_relation (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     topic_id uuid REFERENCES topic(id) NOT NULL,
-    message_id bigint REFERENCES messages(message_id) NOT NULL
+    -- Unique: topic-sorter assigns at most one topic per message (relax to
+    -- UNIQUE (topic_id, message_id) if messages may ever get several topics).
+    message_id bigint REFERENCES messages(message_id) NOT NULL UNIQUE
 );
 
 -- Tracks which messages the topic-sorter has attempted to classify.
