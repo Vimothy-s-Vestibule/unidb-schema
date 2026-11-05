@@ -40,7 +40,7 @@ unattended or to expose to the internet. The problems fall into five buckets:
    - The topic worker also pastes *every topic name ever created* into every request, so requests grow until
      they fail.
    - The end-to-end test reproduced the stall.
-   - *Fixed in the LLM-workers PR.*
+   - *Fixed in sentience-workers#7.*
 4. **Security.**
    - The dashboard has no login, yet shows every message and every AI-inferred personal fact (including health
      and relationship facts the prompt asks for).
@@ -50,7 +50,7 @@ unattended or to expose to the internet. The problems fall into five buckets:
    - *Most of this is fixed in PRs. Real authentication is a decision for you (see roadmap).*
 5. **Almost no tests.**
    - Before: 2 tests across all three repos.
-   - After: about 330, plus fuzzing, mutation testing, an end-to-end test of the whole stack, and CI for every repo.
+   - After: 354, plus fuzzing, mutation testing, an end-to-end test of the whole stack, and CI for every repo.
 
 **The single most important structural risk** is not a bug. The database layout is written out by hand three
 times: SQL, Rust and TypeScript. There is no migration system, so changes never reach an existing database
@@ -79,7 +79,7 @@ Line numbers refer to the audited `main` commits. "Fixed in" points to the draft
 | C-2 | workers `docker-compose.yml:59,62`, `.env.example` | Postgres published on 0.0.0.0:5432 with default superuser `postgres/postgres`. Superuser allows `COPY … FROM PROGRAM`, i.e. code execution in the DB container. | Loopback-only by default: workers#3. Default password still allowed (roadmap) |
 | C-3 | workers (no `.sqlx/`), `Dockerfile` | Workspace **does not compile without a live DB**, so `docker compose build` fails from a clean clone (29× `set DATABASE_URL…`; re-verified). | workers#3 |
 | C-4 | Sentience-dash `src/lib/server/db/index.ts:6` | DB module throws at import time, so `bun run build` and `docker build` **always fail**. | dash#9 |
-| C-5 | workers `fact-extractor/src/extractor.rs` `run()`, `topic-sorter/src/sorter.rs` `run()` | **Head-of-line stall and unbounded LLM spend.** Failed messages are never recorded, and the queue is `ORDER BY … LIMIT N`. One batch that always fails is re-fetched every 5 s forever and nothing else is processed. Reproduced by the e2e negative test. | workers LLM-workers PR (§3) |
+| C-5 | workers `fact-extractor/src/extractor.rs` `run()`, `topic-sorter/src/sorter.rs` `run()` | **Head-of-line stall and unbounded LLM spend.** Failed messages are never recorded, and the queue is `ORDER BY … LIMIT N`. One batch that always fails is re-fetched every 5 s forever and nothing else is processed. Reproduced by the e2e negative test. | workers#7 |
 
 ### High
 
@@ -96,18 +96,18 @@ Line numbers refer to the audited `main` commits. "Fixed in" points to the draft
 | H-9 | workers `Cargo.lock` | `cargo audit`: **32 vulnerabilities + 6 warnings**, incl. rustls/webpki (distrusted CA roots, handshake), h2, quinn-proto. | workers#2 (→ 8, all non-actionable and justified) |
 | H-10 | Sentience-dash `bun.lock` | `bun audit`: **57 advisories** (16 high), incl. SvelteKit unauthenticated Accept-header ReDoS, devalue, svelte SSR XSS. | dash#2 (`--prod`: 26 → **0**) |
 | H-11 | Sentience-dash `src/routes/+layout.svelte:38,93,108-110` | **The known layout issue.** Root cause: `<SideNav isOpen fixed>` at every width (`fixed` disables Carbon's mobile overlay/hamburger) + hard-coded `margin-left: 256px`. On phones the nav covers 240 px of every page and can't be closed; the explorer is unusable; pages overflow by up to 501 px. | dash#7 (with before/after screenshots) |
-| H-12 | workers `topic-sorter/src/sorter.rs:155-166` | **Every** topic name ever created is injected into every system prompt, so prompt size grows without bound (combined with C-5: permanent stall). It is also a persistent prompt-injection vector. | workers LLM-workers PR |
-| H-13 | workers `fact-extractor/src/extractor.rs` | Facts committed in one transaction, attempt row inserted later in a separate statement. A crash in between **duplicates facts**. Same pattern in topic-sorter. | workers LLM-workers PR |
+| H-12 | workers `topic-sorter/src/sorter.rs:155-166` | **Every** topic name ever created is injected into every system prompt, so prompt size grows without bound (combined with C-5: permanent stall). It is also a persistent prompt-injection vector. | workers#7 |
+| H-13 | workers `fact-extractor/src/extractor.rs` | Facts committed in one transaction, attempt row inserted later in a separate statement. A crash in between **duplicates facts**. Same pattern in topic-sorter. | workers#7 |
 
 ### Medium
 
 | ID | Location | Finding | Fixed in |
 |---|---|---|---|
-| M-1 | workers `fact-extractor/src/extractor.rs:449-480` | **Cross-user prompt injection:** ~20 other users' messages are placed in the *system* prompt. A user can steer facts stored against the focal author. Facts are free-text and include special categories. | Partly (LLM-workers PR bounds/validates output). Full fix: roadmap |
+| M-1 | workers `fact-extractor/src/extractor.rs:449-480` | **Cross-user prompt injection:** ~20 other users' messages are placed in the *system* prompt. A user can steer facts stored against the focal author. Facts are free-text and include special categories. | Partly (workers#7 bounds/validates output). Full fix: roadmap |
 | M-2 | workers `ingest…/handlers/attachments.rs:17`, `discord_user.rs:78` | Unbounded downloads into memory, no timeout, HTTP status ignored (a 404 page was stored as the asset). Memory DoS by any member posting large files. | workers#5 (25 MiB cap, 60 s timeout, status check) |
 | M-3 | workers `ingest…/handlers/attachments.rs`, `discord_user.rs:108` | Media rows inserted after a failed S3 upload. Identical avatars collide on the content-hash UNIQUE. Concurrent identical attachments lost links (7/32 kept). | workers#5 |
 | M-4 | workers `ingest…/handlers/message.rs:91,180` | Reply parent looked up in the wrong channel. Forwards treated as replies. Fake placeholders. Sticker-only messages lost stickers. | workers#5 |
-| M-5 | unidb `schema/01,09,10` | No CHECK ranges on `scores.*`, `confidence`, `weight`. fact-extractor stores unclamped LLM values. | unidb#9 (CHECKs), workers LLM-workers PR (clamp) |
+| M-5 | unidb `schema/01,09,10` | No CHECK ranges on `scores.*`, `confidence`, `weight`. fact-extractor stores unclamped LLM values. | unidb#9 (CHECKs), workers#7 (clamp) |
 | M-6 | unidb `schema/11_topics.sql` | `topic.name` and `topic_message_relation.message_id` not UNIQUE. Racy duplicates, and joins multiply rows. No index on `message_id`. | unidb#9 |
 | M-7 | unidb `src/scoring_schema.rs:103` | Prompt says "return null" but `scores.*` is `NOT NULL` / `f64`. Also a broken line continuation. | unidb#9 |
 | M-8 | unidb `schema/06_connected_accounts.sql:13-20` | `social_platforms` seeded with random UUIDs, so ids differ per environment. | unidb#9 (UUIDv5 + remapping migration) |
@@ -120,7 +120,7 @@ Line numbers refer to the audited `main` commits. "Fixed in" points to the draft
 | M-15 | Sentience-dash `src/routes/+page.server.ts:21,80,97,123-129` | Overview charts depend on the **DB session timezone**. 24 h counts include deleted messages. Epoch placeholder rows leak into charts outside UTC (20,763 daily buckets instead of 46). | dash#6 |
 | M-16 | Sentience-dash `api/messages/+server.ts:77,94,103`; `userdata/[id]` | `${col}::text IN (…)` defeats bigint indexes (seq scans). | dash#6 (reactions 18.4 → 0.19 ms; `/` 660 → 231 ms) |
 | M-17 | Sentience-dash pages | 6 serious/critical axe violations (invalid lists, contrast 2.3:1). A 2 MB SVG used as favicon + LCP image. `optimizeCss` never ran. | dash#8 (a11y 93 → 100, SEO 92 → 100) |
-| M-18 | all services | Healthcheck file `/tmp/ready` written before the service is ready. Default log filter `=trace` logs message content and raw LLM output (PII in logs). | LLM-workers PR (readiness for those two); logging: roadmap |
+| M-18 | all services | Healthcheck file `/tmp/ready` written before the service is ready. Default log filter `=trace` logs message content and raw LLM output (PII in logs). | workers#7 (readiness for those two); logging: roadmap |
 | M-19 | all DB clients | `sslmode=prefer` / no TLS, so there is no server authentication. READMEs recommend Supabase over the internet. | Roadmap |
 | M-20 | workers `docker-compose.yml:2` | `env_file: .env` on every worker means every service receives every secret. Missing `.env` made compose fail. | workers#3 (`required: false`). Per-service secrets: roadmap |
 | M-21 | workers `ingest…/discord_handler.rs` | No `message_delete` handler (`delete_message` is dead code). Deleted messages persist and are still sent to the LLM. | Roadmap (privacy) |
@@ -132,7 +132,7 @@ Line numbers refer to the audited `main` commits. "Fixed in" points to the draft
 |---|---|---|---|
 | L-1 | all three repos | No CI at all. `cargo fmt --check` fails in both Rust repos. `bun run lint` fails. | unidb#8, dash#3; workers CI: roadmap |
 | L-2 | workers `Dockerfile`, compose | Containers ran as root. Unpinned `:latest` images. No `init` (every stop waited for SIGKILL). Fixed `container_name`s. | workers#3 |
-| L-3 | workers | Two async-openai versions (0.37/0.38). aws-sdk default features pulled a second, legacy TLS stack. | workers#2 (TLS stack); LLM-workers PR (async-openai) |
+| L-3 | workers | Two async-openai versions (0.37/0.38). aws-sdk default features pulled a second, legacy TLS stack. | workers#2 (TLS stack); workers#7 (async-openai) |
 | L-4 | workers `ingest…/handlers/attachments.rs` | Uploader-controlled `content_type` (CR/LF, empty) passed to S3/DB. Found by fuzzing. | workers#6 |
 | L-5 | serenity 0.12.5 `model/misc.rs:146` (upstream) | `ImageHash::from_str` panics on non-ASCII input (found by fuzzing; not reachable from Discord). | Reported; pinned by a test in workers#6 |
 | L-6 | unidb `schema/06_connected_accounts.sql:63` | `CHECK (mention_message_id IS NOT NULL OR reasoning IS NOT NULL)` is vacuous (`reasoning` is NOT NULL). | Roadmap |
@@ -166,7 +166,7 @@ retargets them to `main` as their bases merge.
 | [#6](https://github.com/Vimothy-s-Vestibule/unidb-schema/pull/6) | [security] Patch vulnerable transitive crates, cargo-deny/audit config | |
 | [#7](https://github.com/Vimothy-s-Vestibule/unidb-schema/pull/7) | [contract] Schema↔model contract tests + `contract/schema.json` | merge before #9 |
 | [#8](https://github.com/Vimothy-s-Vestibule/unidb-schema/pull/8) | [ci] GitHub Actions: fmt, clippy, tests against pgvector | |
-| [#9](https://github.com/Vimothy-s-Vestibule/unidb-schema/pull/9) | [contract] Schema integrity + idempotent migration | stacked on #7; ship with workers LLM-workers PR + #5 |
+| [#9](https://github.com/Vimothy-s-Vestibule/unidb-schema/pull/9) | [contract] Schema integrity + idempotent migration | stacked on #7; ship with workers#7 + #5 |
 | this PR | [docs] SPEC, threat model, ADRs, audit report | |
 
 ### sentience-workers
@@ -178,7 +178,8 @@ retargets them to `main` as their bases merge.
 | [#4](https://github.com/Creative-Difficulty/sentience-workers/pull/4) | [docker] One-command full local stack + mock LLM + e2e test | stacked on #3; needs dash#9 |
 | [#5](https://github.com/Creative-Difficulty/sentience-workers/pull/5) | [arch] ingest: data-loss and race fixes | |
 | [#6](https://github.com/Creative-Difficulty/sentience-workers/pull/6) | [fuzz] ingest: proptest + cargo-fuzz + mutants | stacked on #5 |
-| LLM_WORKERS_PRS | | |
+| [#7](https://github.com/Creative-Difficulty/sentience-workers/pull/7) | [arch] LLM workers: no head-of-line stall, atomic writes, validated output, bounded prompts, honest readiness | ship with unidb#9 |
+| [#8](https://github.com/Creative-Difficulty/sentience-workers/pull/8) | [fuzz] LLM workers: proptest, cargo-fuzz, mutation-gap tests | stacked on #7 |
 
 ### Sentience-dash
 | PR | Title | Notes |
@@ -206,11 +207,11 @@ the workstream that wrote the code.
 |---|---|---|
 | unidb-schema | 2 unit | **48** (lib 5, schema_load 5, model_contract 26, contract_snapshot 1, integrity 8, migrations 3) ✔ |
 | sentience-workers: ingest | 0 | **74** (incl. 12 proptest properties × 512 cases) ✔ |
-| sentience-workers: fact-extractor + topic-sorter | 0 | LLM_WORKERS_TESTS |
+| sentience-workers: fact-extractor + topic-sorter | 0 | **98** (common 21, fact-extractor 30 unit + 13 integration, topic-sorter 21 + 13) ✔ |
 | sentience-workers: mock LLM | — | 5 (Python unit) |
 | full stack | no e2e | **1 e2e** (`scripts/e2e.sh`: 13/13 checks PASS; the negative control correctly FAILs) |
 | Sentience-dash | 0 | **128** (100 unit incl. fast-check ✔, 1 schema contract, 5 integration, 22 Playwright e2e) |
-| **Total** | **2** | LLM_WORKERS_TOTAL |
+| **Total** | **2** | **354** (+ fuzzing, mutation testing, CI in unidb and dash) |
 
 ### Fuzzing / property-based testing
 
@@ -218,7 +219,11 @@ the workstream that wrote the code.
 |---|---|---|---|---|
 | ingest `message_mapping` | cargo-fuzz | 721 s | 6,064,550 | 1 in first run (content-type) → fixed, 0 after |
 | ingest `raw_payloads` | cargo-fuzz | 721 s | 28,283,067 | 1 in first run (upstream serenity panic) → pinned, 0 after |
-| LLM_WORKERS_FUZZ | | | | |
+| fact-extractor `fe_parse` | cargo-fuzz | 12 min | 17,241,763 | 0 |
+| fact-extractor `fe_sanitize` | cargo-fuzz | 12 min | 119,149,583 | 1 harness-precondition crash in first run → constrained, 0 after |
+| topic-sorter `ts_parse` | cargo-fuzz | 12 min | 17,171,924 | 0 |
+| topic-sorter `ts_normalize` | cargo-fuzz | 12 min | 17,136,331 | 0 |
+| LLM workers parse/sanitize/prompts | proptest | 256–2000 cases/property | — | 0 |
 | dash param parsing / grouping | fast-check | 50,000 runs/property | — | 0 |
 | ingest mapping | proptest | 12 × 512 cases | — | 0 |
 
@@ -227,7 +232,7 @@ the workstream that wrote the code.
 | Scope | Tool | Score |
 |---|---|---|
 | ingest mapping/media/scan | cargo-mutants | 62.4% → **94.5%** (103/109; 6 equivalent/untestable) |
-| LLM_WORKERS_MUTANTS | | |
+| fact-extractor + topic-sorter + common | cargo-mutants | 81.3%/35% (pure/DB) → **95.4%** (206/216; 10 equivalent or log-only) |
 | dash `assemble.ts` | Stryker | **100%** (62/62) |
 | dash `assemble.ts` + `server/http` | Stryker | **98.08%** (4 equivalent survivors) |
 
@@ -270,7 +275,7 @@ Written for a non-specialist owner, ranked by impact.
    - **How it works today.** "Done" = a row exists in an `*_attempts` table. There is no "failed" or
      "in progress" state and no lock.
    - **Single-replica problems.** One bad batch stalls the queue, and a crash can duplicate facts. The
-     LLM-workers PR fixes both.
+     workers#7 fixes both.
    - **Problem with two replicas.** Running two copies of a worker would process the same messages twice and
      pay twice. Still open.
    - **Recommended design.** A per-message status row (`pending / in_progress(locked_by, locked_at) / done /
@@ -335,7 +340,7 @@ Written for a non-specialist owner, ranked by impact.
 
 **Weeks 2–3: stop data loss and stalls**
 
-6. Merge workers#5/#6 and the LLM-workers PRs.
+6. Merge workers#5 → #6 and workers#7 → #8.
 7. Merge unidb#7 → #9, and run `migrations/20261104_schema_integrity.sql` against a **copy of production first**,
    then production with a backup. **Merge these together**: unidb#9 adds CHECK constraints that require the
    workers' clamping.
@@ -398,4 +403,4 @@ Written for a non-specialist owner, ranked by impact.
 - The dashboard is meant for server admins, not the public.
 - One Discord guild per deployment (`GUILD_ID` is singular).
 - The neutral score of 0.5 in the fixed scoring prompt (unidb#9) is a placeholder for a product decision.
-- Body length limits and prompt bounds chosen in the LLM-workers PR are defaults, all configurable.
+- Body length limits and prompt bounds chosen in the workers#7 are defaults, all configurable.

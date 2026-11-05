@@ -72,8 +72,8 @@ Trust boundaries:
 | **S**poofing | Dash viewers | No authentication; every visitor is effectively an admin | Optional HTTP Basic auth (Sentience-dash#5); long-term: SSO / Discord OAuth admin allowlist or an authenticating reverse proxy |
 | | DB / S3 | Default credentials (`postgres/postgres`, `devadmin/devadmin`) on ports published on 0.0.0.0 | Loopback-only by default (sentience-workers#3); still to do: no defaults (`${VAR:?}`), strong random secrets |
 | | Postgres server identity | `sslmode=prefer` / no TLS, so a man-in-the-middle can impersonate the DB | `sslmode=verify-full` (not yet done) |
-| **T**ampering | Fact store | Cross-user prompt injection: other users' messages are in the *system* prompt; facts are attributed to the focal author | Untrusted content goes in the user role as data; code-verified evidence spans; record caps (partly in the `[arch]` LLM-workers PR) |
-| | Topic store | Attacker-shaped topic names are injected into every future prompt | Validate/cap topic names; bound the topic list (`[arch]` LLM-workers PR) |
+| **T**ampering | Fact store | Cross-user prompt injection: other users' messages are in the *system* prompt; facts are attributed to the focal author | Untrusted content goes in the user role as data; code-verified evidence spans; record caps (partly in the sentience-workers#7) |
+| | Topic store | Attacker-shaped topic names are injected into every future prompt | Validate/cap topic names; bound the topic list (sentience-workers#7) |
 | | Whole DB | Superuser everywhere; `drizzle db:push`; schema pulled unpinned from `main` | `db:push` guarded (Sentience-dash#3); schema/images pinned (sentience-workers#3); still to do: per-service least-privilege roles |
 | **R**epudiation | Dash access, data changes | No access or audit logging; LLM `reasoning` is model-generated; deletes are not captured | Access logs at a proxy; `message_delete` handler; mark facts as unverified in the UI |
 | **I**nformation disclosure | Dash | All messages and PII facts public; raw SQL errors shown to clients | Generic errors and input validation (Sentience-dash#5); auth |
@@ -81,8 +81,8 @@ Trust boundaries:
 | | LLM provider | All content, including private channels and soft-deleted messages, plus user ids | Channel allowlist, filter deleted messages (topic-sorter: `[arch]` PR), DPA with the provider |
 | | Logs | trace/debug default filters; raw LLM output and signed CDN URLs in errors | info level; redaction |
 | | Transport | DB connections are plaintext or unverified | TLS `verify-full` |
-| **D**enial of service | Ingest | Unbounded downloads (up to 500 MB × 10 per message), unbounded spawns, no timeouts, whole-channel buffering | Size cap and timeouts (`[arch]` ingest PR); semaphore; streaming upload; paged scan |
-| | LLM workers | Batches that always fail are re-fetched forever (head-of-line stall); topic prompt grows without bound | Bounded retries, atomic attempt rows, bounded prompts, LLM timeouts (`[arch]` LLM-workers PR) |
+| **D**enial of service | Ingest | Unbounded downloads (up to 500 MB × 10 per message), unbounded spawns, no timeouts, whole-channel buffering | Size cap and timeouts (sentience-workers#5); semaphore; streaming upload; paged scan |
+| | LLM workers | Batches that always fail are re-fetched forever (head-of-line stall); topic prompt grows without bound | Bounded retries, atomic attempt rows, bounded prompts, LLM timeouts (sentience-workers#7) |
 | | Dash | Heavy unauthenticated aggregate queries; SvelteKit Accept-header ReDoS | Query perf (Sentience-dash#6); patched kit (Sentience-dash#2); auth; caching |
 | **E**levation of privilege | Postgres | Superuser enables `COPY … FROM PROGRAM` = code execution in the DB container | Non-superuser app roles; no published port |
 | | Containers | Workers run as root; a shared `.env` gives every worker every secret | Non-root workers (sentience-workers#3); still to do: `cap_drop: ALL`, read-only rootfs, per-service secrets |

@@ -864,6 +864,9 @@ Verified on 2026-11-04 with rustc/cargo 1.97, bun 1.4.4, Docker, local `pgvector
 
 ## 11. Known gaps and open questions
 
+> Most gaps below have fixes in open draft PRs (November 2026 audit). See [`AUDIT_REPORT.md`](../AUDIT_REPORT.md) §2–§3 for
+> the finding → PR mapping and [`THREAT_MODEL.md`](THREAT_MODEL.md) for the security view. Update this section as they merge.
+
 Schema / contracts
 - No migration system; `schema/*.sql` is only applied to empty databases. How are existing deployments upgraded?
 - Three hand-maintained representations (SQL, Rust models, drizzle) with no automated drift check; drizzle already drifts
