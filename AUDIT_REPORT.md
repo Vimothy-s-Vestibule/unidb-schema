@@ -56,8 +56,8 @@ unattended or to expose to the internet. The problems fall into five buckets:
 times: SQL, Rust and TypeScript. There is no migration system, so changes never reach an existing database
 automatically. The new contract tests now catch drift. Adopting real migrations is the top roadmap item.
 
-**Nothing secret leaked.** gitleaks found no leaks in any repo history. One weak hard-coded database role
-password exists in old unidb history (§2, S-1).
+**Nothing secret leaked.** gitleaks found no leaks in any repo history. One placeholder database role
+password exists in old unidb history; the owner confirmed it was changed afterwards, so it is inert (§2, S-1).
 
 ---
 
@@ -148,7 +148,7 @@ Line numbers refer to the audited `main` commits. "Fixed in" points to the draft
 
 | ID | Repo / file | Commit | Value | Verdict |
 |---|---|---|---|---|
-| S-1 | unidb-schema `migrations/2026-03-15-170646-0000_add_krauze_user/up.sql` | added `514341a`, removed `9b6b672` | `CREATE ROLE "krauzekrap" … PASSWORD 'temp…'` (redacted) | **True positive.** Weak hard-coded DB login password in history. If this role ever existed on a real database, drop it or rotate it. |
+| S-1 | unidb-schema `migrations/2026-03-15-170646-0000_add_krauze_user/up.sql` | added `514341a`, removed `9b6b672` | `CREATE ROLE "krauzekrap" … PASSWORD 'temp…'` (redacted) | True positive, **already remediated**: a placeholder ("temp") password for a DB login role. The owner confirmed it was changed in the database console after this migration ran, so the value in history is inert. Only the role name is exposed. No further action. |
 | S-2 | workers `docker-compose.yml`, `.env.example` | `3c51999` → HEAD | `post…`, `deva…` | Insecure defaults, not a leak. |
 | — | everything else | all refs, full history (gitleaks 8.28 + manual regexes for Discord/AWS/OpenAI/GitHub tokens, PEM, Supabase URLs) | — | No findings. |
 
@@ -336,32 +336,31 @@ Written for a non-specialist owner, ranked by impact.
 3. Decide on dashboard access. Until real auth exists, set `DASH_BASIC_AUTH_*` and keep the dashboard on
    localhost/VPN.
 4. Set a strong `POSTGRES_PASSWORD` and rustfs keys; remove the defaults (`${VAR:?}`).
-5. If the role `krauzekrap` (S-1) exists anywhere, drop it.
 
 **Weeks 2–3: stop data loss and stalls**
 
-6. Merge workers#5 → #6 and workers#7 → #8.
-7. Merge unidb#7 → #9, and run `migrations/20261104_schema_integrity.sql` against a **copy of production first**,
+5. Merge workers#5 → #6 and workers#7 → #8.
+6. Merge unidb#7 → #9, and run `migrations/20261104_schema_integrity.sql` against a **copy of production first**,
    then production with a backup. **Merge these together**: unidb#9 adds CHECK constraints that require the
    workers' clamping.
-8. Regenerate `.sqlx/` once all query-changing PRs are in (`cargo sqlx prepare --workspace`).
-9. Merge the dash stack #3 → #4 → #5 → #6, then #7 → #8.
+7. Regenerate `.sqlx/` once all query-changing PRs are in (`cargo sqlx prepare --workspace`).
+8. Merge the dash stack #3 → #4 → #5 → #6, then #7 → #8.
 
 **Month 1: make it maintainable**
 
-10. Adopt `sqlx migrate`, tag unidb releases, and pin every consumer to a tag.
-11. Add CI to sentience-workers: fmt, clippy, tests with a pgvector service, `cargo sqlx prepare --check`,
+9. Adopt `sqlx migrate`, tag unidb releases, and pin every consumer to a tag.
+10. Add CI to sentience-workers: fmt, clippy, tests with a pgvector service, `cargo sqlx prepare --check`,
     `cargo deny`, `cargo audit`, the e2e test. Pin Actions by SHA in all repos.
-12. Least-privilege DB roles; TLS `verify-full` to Postgres.
-13. Structured logging + metrics + honest healthchecks.
+11. Least-privilege DB roles; TLS `verify-full` to Postgres.
+12. Structured logging + metrics + honest healthchecks.
 
 **Quarter: product and design decisions**
 
-14. Job-queue redesign with claim/lease and backoff (enables more than one worker replica).
-15. LLM prompt-injection hardening and verified evidence spans.
-16. Privacy: handle `message_delete`, a channel allowlist, retention, per-user erasure, consent/notice. Review
+13. Job-queue redesign with claim/lease and backoff (enables more than one worker replica).
+14. LLM prompt-injection hardening and verified evidence spans.
+15. Privacy: handle `message_delete`, a channel allowlist, retention, per-user erasure, consent/notice. Review
     Discord's developer policy and GDPR obligations before running this on a real community.
-17. Add licenses to sentience-workers and Sentience-dash, and a `LICENSE` file to unidb-schema.
+16. Add licenses to sentience-workers and Sentience-dash, and a `LICENSE` file to unidb-schema.
 
 ---
 
@@ -379,7 +378,7 @@ Written for a non-specialist owner, ranked by impact.
   - The ingester's `discord` profile was only checked with `docker compose config`; it needs a real token.
   - The unidb migration was tested from the `a7a7c55` baseline only. The drizzle enum order hints that the live
     DB was hand-altered, so **run it on a production copy first**.
-- **No secrets used** (rule 5). S-1 is reported only.
+- **No secrets used** (rule 5). S-1 was reported only; the owner has since confirmed that password was changed.
 - **CI workflows** (rule 6). None of the repos had workflows before, so nothing blocked PRs. The workflows
   added in unidb#8 and dash#3/#4 only build, lint and test, with `contents: read` and no secrets. They will run
   on these PRs.
